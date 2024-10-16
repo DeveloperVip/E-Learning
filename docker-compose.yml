@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image:  postgres:16.0-alpine
+    container_name: E_Learning_Postgres
+    
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: E_Learning
+    volumes:
+      - postgres:/data
+    ports:
+      - ${DATABASE_PORT}:5432
+
+volumes:
+  postgres:
+    driver: local
