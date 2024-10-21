@@ -1,6 +1,6 @@
 import { AuthService } from './../auth/auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './domain/users.entity';
@@ -9,13 +9,16 @@ import { compare, hash as hashBcrypt } from 'bcryptjs';
 import { LoginDto } from './dto/login-user.dto';
 import { ResponseLoginDto } from './dto/response-login-dto';
 import { statusResponse } from './status.enum';
+import { EmailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(UserEntity)
     private readonly UserRepository: Repository<UserEntity>,
     private readonly AuthService: AuthService,
+    private readonly EmailModule: EmailService,
   ) {}
 
   public async createUser(userInfo: CreateUserDto): Promise<string> {
@@ -32,6 +35,11 @@ export class UsersService {
       const verificationToken = this.AuthService.generateVerificationToken(
         newUser.email,
       );
+
+      await this.EmailModule.sendVerificationEmail(
+        newUser.email,
+        verificationToken,
+      );
       return newUser.id;
     }
     return user.id;
@@ -44,7 +52,7 @@ export class UsersService {
       },
       select: ['userName', 'fullName', 'email', 'password'],
     });
-
+    this.logger.log(user.email, user.password);
     if (!user) {
       const response: ResponseLoginDto = {
         data: null,

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { readFile } from 'fs';
+import { readFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
 
 @Injectable()
-export class MailService {
+export class EmailService {
   private readonly transporter: Transporter;
   constructor(private readonly configService: ConfigService) {
     this.transporter = createTransport({
@@ -33,7 +33,13 @@ export class MailService {
     }
     await this.transporter.sendMail({
       ...mailOptions,
-      from: mailOptions.from || this.configService.get('MAIL_FROM'),
+      from:
+        mailOptions.from ||
+        `"${this.configService.get('MAIL_USER', {
+          infer: true,
+        })}" <${this.configService.get('MAIL_FROM', {
+          infer: true,
+        })}>`,
       html: mailOptions.html ? mailOptions.html : html,
     });
   }
@@ -43,12 +49,11 @@ export class MailService {
     await this.sendMail({
       to: email,
       subject: 'Xác nhận',
-      templatePath: `${process.cwd()}/dist/assets/template/mail.hbs`,
+      templatePath: `${process.cwd()}/dist/assets/libs/mail/src/template-email/mail.hbs`,
       context: {
         title: 'Xác nhận email',
         url,
       },
     });
   }
-  
 }
