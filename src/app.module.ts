@@ -3,8 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtStrategy } from './modules/auth/jwt.stratery';
+import { JwtStrategy } from './libs/auth-lib/stratery/jwt.stratery';
 import { AuthConfigModule } from './modules/auth/auth.config.module';
+import { FileUploadModule } from './modules/files/files.module';
+import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
+import { AuthModule } from './modules/auth/auth.module';
+import { AuthLibModule } from './libs/auth-lib/auth.lib.module';
 
 @Module({
   imports: [
@@ -21,8 +25,11 @@ import { AuthConfigModule } from './modules/auth/auth.config.module';
     }),
 
     UsersModule,
+    FileUploadModule,
+    AuthModule,
+    AuthLibModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, CloudinaryService],
 })
 export class AppModule {}

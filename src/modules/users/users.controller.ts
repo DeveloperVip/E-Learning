@@ -14,8 +14,8 @@ export class UserController {
     return this.usersService.createUser(userInfo);
   }
 
-  @Post('/login')
+  @Post('/find')
   public async userLogin(@Body() userLogin: LoginDto) {
-    return this.usersService.validateLogin(userLogin);
+    return this.usersService.findUser(userLogin.email);
   }
 }
