@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './stratery/jwt.stratery';
 import { UsersModule } from 'src/modules/users/users.module';
 import { EmailModule } from 'src/modules/mail/mail.module';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { EmailModule } from 'src/modules/mail/mail.module';
       }),
     }),
   ],
-  providers: [AuthService, LocalStratery, JwtStrategy],
+  providers: [AuthService, LocalStratery, JwtStrategy, JwtAuthGuard],
   exports: [LocalStratery, AuthService],
 })
 export class AuthLibModule {}

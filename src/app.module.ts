@@ -9,6 +9,7 @@ import { FileUploadModule } from './modules/files/files.module';
 import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthLibModule } from './libs/auth-lib/auth.lib.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -23,11 +24,11 @@ import { AuthLibModule } from './libs/auth-lib/auth.lib.module';
       schema: 'E_Learning_1',
       entities: [__dirname + '/modules/**/domain/*.entity{.ts,.js}'],
     }),
-
+    AuthLibModule,
+    CloudinaryModule,
     UsersModule,
     FileUploadModule,
     AuthModule,
-    AuthLibModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CloudinaryService],
