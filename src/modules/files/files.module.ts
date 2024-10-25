@@ -3,11 +3,14 @@ import { FileUploadController } from './files.controller';
 import { MulterModule } from '@nestjs/platform-express';
 
 import { FileUploadService } from './files.service';
-import { CloudinaryProvider } from 'src/modules/cloudinary/cloudinary.provider';
+
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { diskStorage } from 'multer';
+
+import { CloudinaryProvider } from '../cloudinary/cloudinary.provider';
 import { AuthLibModule } from 'src/libs/auth-lib/auth.lib.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -61,6 +64,16 @@ import { AuthLibModule } from 'src/libs/auth-lib/auth.lib.module';
           return {};
         }
       },
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '60s',
+        },
+      }),
     }),
     AuthLibModule,
   ],
