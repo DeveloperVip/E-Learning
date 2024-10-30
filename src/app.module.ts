@@ -10,6 +10,9 @@ import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthLibModule } from './libs/auth-lib/auth.lib.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { ProductsModule } from './modules/products/products.module';
+// import { JwtModule } from '@nestjs/jwt';
+// import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -24,13 +27,16 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
       schema: 'E_Learning_1',
       entities: [__dirname + '/modules/**/domain/*.entity{.ts,.js}'],
     }),
+
     AuthLibModule,
     CloudinaryModule,
     UsersModule,
     FileUploadModule,
     AuthModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CloudinaryService],
+  exports: [],
 })
 export class AppModule {}

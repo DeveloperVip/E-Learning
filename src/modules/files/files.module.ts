@@ -10,7 +10,7 @@ import { diskStorage } from 'multer';
 
 import { CloudinaryProvider } from '../cloudinary/cloudinary.provider';
 import { AuthLibModule } from 'src/libs/auth-lib/auth.lib.module';
-import { JwtModule } from '@nestjs/jwt';
+// import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -64,16 +64,6 @@ import { JwtModule } from '@nestjs/jwt';
           return {};
         }
       },
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '60s',
-        },
-      }),
     }),
     AuthLibModule,
   ],

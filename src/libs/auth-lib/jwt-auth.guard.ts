@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import {
   Injectable,
   ExecutionContext,
@@ -8,11 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private readonly jwtService: JwtService) {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly ConfigService: ConfigService,
+  ) {
     super();
   }
 
-  canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<any> {
     const request = context.switchToHttp().getRequest();
     const authorizationHeader = request.headers.authorization;
 
@@ -29,7 +33,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     try {
       console.log('Extracted JWT Token:', token);
-      const decodedToken = this.jwtService.verify(token);
+      const decodedToken = await this.jwtService.verifyAsync(token, {
+        secret: this.ConfigService.get<string>('SECRETKEY'),
+      });
       console.log('Decoded Token:', decodedToken); // Log thông tin từ token
     } catch (err) {
       console.log('Error decoding token:', err); // Log lỗi nếu không thể giải mã token
