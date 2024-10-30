@@ -53,8 +53,9 @@ export class AuthService {
     return response;
   }
 
-  public async login(user): Promise<ResponseLoginDto> {
+  public async login(userInfo): Promise<ResponseLoginDto> {
     //register token
+    const user: any = await this.UsersService.findUser(userInfo.email);
     const token = await this.signToken(user);
     const response: ResponseLoginDto = {
       data: token,

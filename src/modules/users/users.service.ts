@@ -27,7 +27,7 @@ export class UsersService {
       where: {
         email: email,
       },
-      select: ['userName', 'fullName', 'email', 'password'],
+      select: ['id', 'userName', 'fullName', 'email', 'password'],
     });
     this.logger.log(user.email, user.password);
     return user;

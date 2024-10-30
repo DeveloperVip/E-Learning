@@ -29,8 +29,9 @@ export class ProductsController {
     @Request() req,
     @Body() productDetail: ProductsDto,
   ): Promise<ProductResponseDto> {
-    return this.ProductsService.createProducts({
-      userId: req.userId,
+    console.log(req);
+    return await this.ProductsService.createProducts({
+      userId: req.user.userId,
       ...productDetail,
     });
   }
