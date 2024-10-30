@@ -16,11 +16,15 @@ export class ProductsService {
   public async createProducts(
     productInfo: ProductsDto,
   ): Promise<ProductResponseDto> {
-    const product = this.ProductsRepository.findOne({
+    const product = await this.ProductsRepository.findOne({
       where: { name: productInfo.name, userId: productInfo.userId },
     });
     if (!isDefined(product)) {
-      const newProduct = this.ProductsRepository.create(productInfo);
+      const newProduct = await this.ProductsRepository.save({
+        ...productInfo,
+        userId: productInfo.userId,
+      });
+      console.log(newProduct);
       return {
         data: newProduct.id,
         message: 'Create product success',
