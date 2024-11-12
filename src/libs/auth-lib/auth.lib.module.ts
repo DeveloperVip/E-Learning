@@ -5,14 +5,13 @@ import { AuthService } from './auth.lib.service';
 import { LocalStratery } from './stratery/local.stratery';
 import { JwtStrategy } from './stratery/jwt.stratery';
 import { UsersModule } from 'src/modules/users/users.module';
-import { EmailModule } from 'src/modules/mail/mail.module';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
+import { EmailService } from '@shared';
 
 @Module({
   imports: [
     ConfigModule,
-    EmailModule,
     forwardRef(() => UsersModule),
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -29,10 +28,15 @@ import { JwtModule } from '@nestjs/jwt';
           },
         }),
     }),
-
     JwtModule,
   ],
-  providers: [AuthService, LocalStratery, JwtStrategy, JwtAuthGuard],
+  providers: [
+    AuthService,
+    LocalStratery,
+    JwtStrategy,
+    JwtAuthGuard,
+    EmailService,
+  ],
   exports: [LocalStratery, AuthService, JwtModule],
 })
 export class AuthLibModule {}

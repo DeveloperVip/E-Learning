@@ -16,6 +16,15 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@*":["src/*"],
+      "@app/*":["src/modules/app/*"],
+      "@config/*":["src/config/*"],
+      "@shared/*":["src/shared/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude":["node_modules","dist","*.js"],
+  "types":["node"]
 }

@@ -1,5 +1,19 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { IProducts } from './products.model';
+import { StoreEntity } from '@modules/store/domain/store.entity';
+import { ProductVariantEntity } from '@modules/products-variant/domain/variant.entity';
+import { CategoryEntity } from '@modules/categories/domain/categories.entity';
+import { BrandEntity } from '@modules/brand/domain/brand.entity';
 
 @Entity('products')
 export class ProducstEntity extends BaseEntity implements IProducts {
@@ -8,33 +22,51 @@ export class ProducstEntity extends BaseEntity implements IProducts {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ name: 'user_id', type: 'uuid' })
-  userId: string;
-
-  @Column({ type: 'varchar', length: 255 })
-  category: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  origin?: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  color?: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  size?: string;
-
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ name: 'remaining_quantity', type: 'int' })
-  remainingQuantity: number;
+  @Column({ default: false })
+  isArchived: boolean;
 
-  @Column({ name: 'quantity_sold', type: 'int' })
-  quantitySold: number;
+  @Column({ default: false })
+  isFeatured: boolean;
 
-  @Column({ name: 'image_url', type: 'varchar', length: 255 })
-  imageURL: string;
+  // @Column({ type: 'uuid', length: 255 })
+  // storeId: string;
 
-  @Column({ type: 'int' })
-  price: number;
+  @ManyToOne(() => StoreEntity, (store) => store.products)
+  @JoinColumn({ name: 'store_id' })
+  store: StoreEntity;
+
+  @ManyToOne(() => BrandEntity, (brand) => brand.products)
+  @JoinColumn({ name: 'brand_id' })
+  brand: CategoryEntity;
+
+  @ManyToOne(() => CategoryEntity, (categories) => categories.products)
+  @JoinColumn({ name: 'categories_id' })
+  categories: CategoryEntity;
+
+  @OneToMany(
+    () => ProductVariantEntity,
+    (productVariant) => productVariant.product,
+    {
+      cascade: true,
+    },
+  )
+  productVariants: ProductVariantEntity[];
+
+  @CreateDateColumn({
+    name: 'create_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createAt: Date;
+
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  updateAt: Date;
 }

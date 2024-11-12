@@ -8,7 +8,7 @@ import { LoginDto } from 'src/modules/users/dto/login-user.dto';
 import { ResponseLoginDto } from 'src/modules/users/dto/response-login-dto';
 import { statusResponse } from 'src/modules/users/status.enum';
 import { isDefined } from 'class-validator';
-import { EmailService } from 'src/modules/mail/mail.service';
+import { EmailService } from '@shared';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly UsersService: UsersService,
-    private readonly EmailModule: EmailService,
+    private readonly EmailService: EmailService,
   ) {}
 
   public async validateUser(loginDto: LoginDto): Promise<ResponseLoginDto> {
@@ -85,7 +85,7 @@ export class AuthService {
 
       const verificationToken = this.generateVerificationToken(newUser.email);
 
-      await this.EmailModule.sendVerificationEmail(
+      await this.EmailService.sendVerificationEmail(
         newUser.email,
         verificationToken,
       );

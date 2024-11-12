@@ -12,11 +12,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('SECRETKEY'),
     });
-    console.log(configService.get<string>('SECRETKEY'));
+    // console.log(configService.get<string>('SECRETKEY'));
   }
 
   async validate(payload: any) {
-    this.logger.log(payload);
+    // this.logger.log(payload);
     return { userId: payload.id, email: payload.email };
   }
 }

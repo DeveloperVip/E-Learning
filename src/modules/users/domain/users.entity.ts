@@ -1,5 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { IUser } from './users.model';
+import { Matches, MaxLength, MinLength } from 'class-validator';
+import { StoreEntity } from '@modules/store/domain/store.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntity implements IUser {
@@ -16,5 +24,14 @@ export class UserEntity extends BaseEntity implements IUser {
   email: string;
 
   @Column({ nullable: false, type: 'varchar' })
+  @MinLength(8)
+  @MaxLength(20)
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,} $/)
   password: string;
+
+  @OneToMany(() => StoreEntity, (store) => store.user, {
+    cascade: true,
+    nullable: true,
+  })
+  store: StoreEntity;
 }

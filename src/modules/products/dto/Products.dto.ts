@@ -1,25 +1,29 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class ProductsDto {
-  @ApiProperty({ example: 'product_name' })
+  @IsString()
+  @IsNotEmpty()
   name: string;
-  userId?: string;
-  @ApiProperty({ example: 'category' })
-  category: string;
-  @ApiProperty({ example: 'origin' })
-  origin?: string;
-  @ApiProperty({ example: 'color' })
-  color?: string;
-  @ApiProperty({ example: 'size' })
-  size?: string;
-  @ApiProperty({ example: 'description' })
+
+  @IsString()
+  @IsNotEmpty()
   description: string;
-  @ApiProperty({ example: 'remaining_quantity' })
-  remainingQuantity: number;
-  @ApiProperty({ example: 'quantity_sold' })
-  quantitySold: number;
-  @ApiProperty({ example: 'image_URL' })
-  imageURL: string;
-  @ApiProperty({ example: 'price' })
-  price: number;
+
+  @IsOptional()
+  isArchived?: boolean;
+
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  brandId: string; // Chỉ cần ID của brand
+
+  @IsString()
+  @IsNotEmpty()
+  categoryId: string; // Chỉ cần ID của category
+
+  @IsString()
+  @IsNotEmpty()
+  storeId: string; // Chỉ cần ID của store
 }

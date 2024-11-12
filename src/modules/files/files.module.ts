@@ -7,9 +7,8 @@ import { FileUploadService } from './files.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { diskStorage } from 'multer';
-
-import { CloudinaryProvider } from '../cloudinary/cloudinary.provider';
 import { AuthLibModule } from 'src/libs/auth-lib/auth.lib.module';
+import { FileSizeValidatorPipe } from './fileSizeValidatorPipe';
 // import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -60,14 +59,13 @@ import { AuthLibModule } from 'src/libs/auth-lib/auth.lib.module';
               }),
             },
           };
-        } else {
-          return {};
         }
+        return {};
       },
     }),
     AuthLibModule,
   ],
   controllers: [FileUploadController],
-  providers: [CloudinaryProvider, FileUploadService, AuthLibModule],
+  providers: [FileUploadService, AuthLibModule, FileSizeValidatorPipe],
 })
 export class FileUploadModule {}
