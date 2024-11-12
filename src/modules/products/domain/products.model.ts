@@ -1,13 +1,11 @@
 export interface IProducts {
   name: string;
-  userId: string;
-  category: string;
-  origin?: string;
-  color?: string;
-  size?: string;
+  storeId?: string;
+  categoriesId?: string;
   description: string;
-  remainingQuantity: number;
-  quantitySold: number;
-  imageURL: string;
-  price: number;
+  brandId?: string;
+  isArchived: boolean;
+  isFeatured: boolean;
+  createAt: Date;
+  updateAt: Date;
 }

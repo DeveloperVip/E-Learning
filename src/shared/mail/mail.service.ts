@@ -1,5 +1,12 @@
+import {
+  FRONTEND_DOMAIN,
+  MAIL_FROM,
+  MAIL_HOST,
+  MAIL_PASSWORD,
+  MAIL_PORT,
+  MAIL_USER,
+} from '@config';
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { readFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
@@ -7,13 +14,13 @@ import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
 @Injectable()
 export class EmailService {
   private readonly transporter: Transporter;
-  constructor(private readonly configService: ConfigService) {
+  constructor() {
     this.transporter = createTransport({
-      host: this.configService.get('MAIL_HOST'),
-      port: this.configService.get('MAIL_PORT'),
+      host: MAIL_HOST,
+      port: parseInt(MAIL_PORT),
       auth: {
-        user: this.configService.get('MAIL_USER'),
-        pass: this.configService.get('MAIL_PASSWORD'),
+        user: MAIL_USER,
+        pass: MAIL_PASSWORD,
       },
     });
   }
@@ -33,19 +40,13 @@ export class EmailService {
     }
     await this.transporter.sendMail({
       ...mailOptions,
-      from:
-        mailOptions.from ||
-        `"${this.configService.get('MAIL_USER', {
-          infer: true,
-        })}" <${this.configService.get('MAIL_FROM', {
-          infer: true,
-        })}>`,
+      from: mailOptions.from || `"${MAIL_USER}" <${MAIL_FROM}>`,
       html: mailOptions.html ? mailOptions.html : html,
     });
   }
 
   async sendVerificationEmail(email: string, token: string): Promise<void> {
-    const url = `${this.configService.get('FRONTEND_DOMAIN')}/auth/confirm/token= ${token}`;
+    const url = `${FRONTEND_DOMAIN}/auth/confirm/token= ${token}`;
     await this.sendMail({
       to: email,
       subject: 'Xác nhận',
