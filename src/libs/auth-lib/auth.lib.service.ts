@@ -1,13 +1,13 @@
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcryptjs';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from 'src/modules/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/modules/users/users.service';
 import { LoginDto } from 'src/modules/users/dto/login-user.dto';
 import { ResponseLoginDto } from 'src/modules/users/dto/response-login-dto';
 import { statusResponse } from 'src/modules/users/status.enum';
-import { isDefined } from 'class-validator';
+// import { isDefined } from 'class-validator';
 import { EmailService } from '@shared';
 
 @Injectable()
@@ -56,13 +56,19 @@ export class AuthService {
   public async login(userInfo): Promise<ResponseLoginDto> {
     //register token
     const user: any = await this.UsersService.findUser(userInfo.email);
-    const token = await this.signToken(user);
-    const response: ResponseLoginDto = {
-      data: token,
-      status: statusResponse.SUCCESS,
-      message: 'login success',
-    };
-    return response;
+    if (user && user.isConfirmed) {
+      const token = await this.signToken(user);
+      const response: ResponseLoginDto = {
+        data: token,
+        status: statusResponse.SUCCESS,
+        message: 'login success',
+      };
+      return response;
+    } else
+      throw new HttpException(
+        'Account has not been created yet ',
+        HttpStatus.NOT_FOUND,
+      );
   }
 
   public async signToken(
@@ -78,19 +84,33 @@ export class AuthService {
     return Buffer.from(email).toString('base64');
   }
 
-  public async createUser(userInfo: CreateUserDto): Promise<string> {
-    const user: any = await this.UsersService.findUser(userInfo.email);
-    if (!isDefined(user)) {
-      const newUser = await this.UsersService.createUser(user);
+  public async createUser(userInfo: CreateUserDto): Promise<any> {
+    try {
+      const newUser = await this.UsersService.createUser(userInfo);
 
-      const verificationToken = this.generateVerificationToken(newUser.email);
-
+      // Gửi email xác nhận cho người dùng với mã xác nhận
       await this.EmailService.sendVerificationEmail(
         newUser.email,
-        verificationToken,
+        newUser.confirmationCode,
       );
-      return newUser.id;
+
+      // Trả về URL hoặc thông báo để frontend chuyển hướng
+      return {
+        message:
+          'User created successfully. Please check your email to verify your account.',
+        redirectUrl: `/confirm-code?email=${newUser.email}`,
+      };
+    } catch (error) {
+      // Xử lý lỗi và trả về phản hồi lỗi
+      if (error)
+        throw new HttpException(
+          'Failed to create user or send verification email',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
     }
-    return user.id;
+  }
+
+  async authenticateCreateUser(email, confirmationCode): Promise<any> {
+    await this.UsersService.confirmUser(confirmationCode, email);
   }
 }

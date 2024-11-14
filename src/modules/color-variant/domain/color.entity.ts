@@ -17,15 +17,19 @@ import { ProductVariantEntity } from '@modules/products-variant/domain/variant.e
 export class ColorEntity extends BaseEntity implements IColor {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+  @Column({ name: 'name', type: 'varchar' })
+  name: string;
+  @Column({ name: 'value', type: 'varchar' })
+  value: string;
+
   @ManyToOne(() => StoreEntity, (store) => store.colors, { nullable: true })
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
   // @Column({ name: 'store_id', type: 'uuid' })
   // storeId: string;
-  @Column({ name: 'name', type: 'varchar' })
-  name: string;
-  @Column({ name: 'value', type: 'varchar' })
-  value: string;
 
   @OneToMany(
     () => ProductVariantEntity,

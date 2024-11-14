@@ -44,6 +44,7 @@ export class CreateBillboardTable1624567891234 implements MigrationInterface {
           {
             name: 'store_id',
             type: 'uuid',
+            isNullable: false,
           },
         ],
       }),

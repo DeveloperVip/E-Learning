@@ -18,6 +18,11 @@ export class SizeEntity extends BaseEntity implements ISize {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+  @Column({ name: 'name', type: 'varchar', nullable: false })
+  name: string;
+
   @ManyToOne(() => StoreEntity, (store) => store.sizes)
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
@@ -30,12 +35,6 @@ export class SizeEntity extends BaseEntity implements ISize {
     },
   )
   productVariants: ProductVariantEntity[];
-
-  // @Column({ name: 'store_id', type: 'uuid', nullable: false })
-  // storeId: string;
-
-  @Column({ name: 'name', type: 'varchar', nullable: false })
-  name: string;
 
   @CreateDateColumn({
     name: 'create_at',

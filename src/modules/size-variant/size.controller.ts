@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   UseGuards,
@@ -19,13 +18,9 @@ import { SizeEntity } from './domain/size.entity';
 export class SizeController {
   constructor(private readonly SizeService: SizeService) {}
 
-  @Get('/get-size-by-id:id')
-  async GetSizeById(id: string): Promise<SizeEntity> {
-    const size = await this.SizeService.getSizeById(id);
-    if (!size) {
-      throw new NotFoundException('size not exist');
-    }
-    return size;
+  @Get('/get-size-by-id/:id')
+  async GetSizeById(@Param('id') id: string): Promise<SizeEntity> {
+    return await this.SizeService.getSizeById(id);
   }
 
   @Get('get-all')
@@ -35,22 +30,32 @@ export class SizeController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Post('create')
-  @ApiBody({ type: CreateSizeDTO })
-  async CreateSizeController(@Body() data, @Param() storeId: string) {
-    const dataSize: CreateSizeDTO = {
-      ...data,
-      storeId: storeId,
-    };
-    await this.SizeService.createSize(dataSize);
+  @Get('get-all-by-user/:storeId')
+  async GetByUser(@Param('storeId') storeId: string): Promise<SizeEntity[]> {
+    return await this.SizeService.findByUser(storeId);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Delete('delete')
+  @Post('create/:storeId')
+  @ApiBody({ type: CreateSizeDTO })
+  async CreateSizeController(
+    @Body() data: CreateSizeDTO,
+    @Param('storeId') storeId: string,
+  ) {
+    const dataSize: CreateSizeDTO = {
+      ...data,
+      storeId: storeId,
+    };
+    return await this.SizeService.createSize(dataSize);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete/:storeId/:sizeId')
   async DeleteSizeController(
-    @Param() storeId: string,
-    @Param() sizeId: string,
+    @Param('storeId') storeId: string,
+    @Param('sizeId') sizeId: string,
   ) {
     await this.SizeService.deleteSize({ storeId: storeId, id: sizeId });
   }

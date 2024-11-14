@@ -1,5 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 // create-brand.dto.ts
 export class CreateBrandDTO {
-  readonly name: string;
-  readonly storeId: string;
+  @ApiProperty({ example: 'name brand' })
+  name: string;
+  storeId?: string;
 }

@@ -21,7 +21,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const authorizationHeader = request.headers.authorization;
 
     // Log toàn bộ header Authorization để kiểm tra token
-    console.log('Authorization Header:', authorizationHeader);
+    // console.log(
+    //   'Authorization Header:',
+    //   this.ConfigService.get<string>('SECRETKEY'),
+    // );
 
     // Nếu không có token, log và ném ra lỗi Unauthorized
     if (!authorizationHeader) {
@@ -32,9 +35,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const token = authorizationHeader.split(' ')[1];
 
     try {
-      console.log('Extracted JWT Token:', token);
+      // const secret = await this.ConfigService.get<string>('SECRETKEY', {
+      //   infer: true,
+      // });
+      const secret = await this.ConfigService.get<string>('secret');
+      console.log('Extracted JWT Token:', token, secret);
       const decodedToken = await this.jwtService.verifyAsync(token, {
-        secret: this.ConfigService.get<string>('SECRETKEY'),
+        secret: this.ConfigService.get<string>('secret'),
       });
       console.log('Decoded Token:', decodedToken); // Log thông tin từ token
     } catch (err) {

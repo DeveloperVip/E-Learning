@@ -3,6 +3,8 @@ import { ColorService } from './color.service';
 import {
   Body,
   Controller,
+  Delete,
+  Get,
   // Delete,
   Param,
   Post,
@@ -20,19 +22,45 @@ export class ColorController {
   //create color
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Post('create')
+  @Post('create/:storeId')
   @ApiBody({ type: OmitType(CreateColorDTO, ['storeId'] as const) })
-  async createColorController(@Param() storeId: string, @Body() req) {
+  async createColorController(
+    @Param('storeId') storeId: string,
+    @Body() req: CreateColorDTO,
+  ) {
     const data = {
       ...req,
-      stored: storeId,
+      storeId: storeId,
     };
     return this.ColorService.createColor(data);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('get/:id')
+  async getColorById(@Param('id') id: string) {
+    return await this.ColorService.findById(id);
+  }
+
+  @Get('get-all')
+  async getAllColor() {
+    return await this.ColorService.findAllColor();
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('get-by-user/:storeId')
+  async getColorByUser(@Param('storeId') storeId: string) {
+    return await this.ColorService.findByUser(storeId);
+  }
   // //delete color
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
-  // @Delete(':id')
-  // async deleteColorController(@Param())
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete/:storeId/:id')
+  async deleteColorController(
+    @Param('id') id: string,
+    @Param('storeId') storeId: string,
+  ) {
+    return await this.ColorService.deleteColor(id, storeId);
+  }
 }

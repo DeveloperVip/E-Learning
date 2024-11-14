@@ -13,28 +13,33 @@ export class BillboardService {
 
   // Lấy tất cả bảng quảng cáo
   async findAll(): Promise<BillboardEntity[]> {
-    return this.BillboardRepository.find(); // Truy vấn tất cả các bản ghi
+    return await this.BillboardRepository.createQueryBuilder('billboard')
+      .leftJoinAndSelect('billboard.store', 'store')
+      .leftJoinAndSelect('billboard.categories', 'categories')
+      .select(['billboard', 'store.id', 'store.name', 'categories.name'])
+      .getMany(); // Truy vấn tất cả các bản ghi
   }
 
   // Lấy bảng quảng cáo theo ID
-  async findOne(id: string): Promise<BillboardEntity> {
-    return this.BillboardRepository.findOne({
-      where: { id },
-      relations: ['store'],
-    }); // Truy vấn theo ID
+  async findOne(id: string): Promise<any> {
+    return await this.BillboardRepository.createQueryBuilder('billboard')
+      .leftJoinAndSelect('billboard.store', 'store')
+      .select(['billboard', 'store.id', 'store.name'])
+      .where('billboard.id = :id', { id })
+      .getOne(); // Truy vấn theo ID
   }
 
   public async createBillboard(data: CreateBillboardDTO) {
+    console.log('🚀 ~ BillboardService ~ createBillboard ~ data:', data);
     const exist = await this.BillboardRepository.findOne({
       where: { label: data.label },
     });
     if (exist)
       throw new HttpException('Billboard was existed', HttpStatus.CONFLICT);
-    await this.BillboardRepository.save({
+    return await this.BillboardRepository.save({
+      storeId: data.storeId,
       ...data,
-      store: { id: data.storeId },
     });
-    throw new HttpException('Billboard created', HttpStatus.CREATED);
   }
 
   async update(

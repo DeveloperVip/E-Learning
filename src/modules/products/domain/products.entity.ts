@@ -25,14 +25,20 @@ export class ProducstEntity extends BaseEntity implements IProducts {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isArchived: boolean;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isFeatured: boolean;
 
-  // @Column({ type: 'uuid', length: 255 })
-  // storeId: string;
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+
+  @Column({ name: 'brand_id', type: 'uuid' })
+  brandId: string;
+
+  @Column({ name: 'categories_id', type: 'uuid' })
+  categoriesId: string;
 
   @ManyToOne(() => StoreEntity, (store) => store.products)
   @JoinColumn({ name: 'store_id' })

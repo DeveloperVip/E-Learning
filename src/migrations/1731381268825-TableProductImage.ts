@@ -29,6 +29,11 @@ export class CreateImageTable1630503939444 implements MigrationInterface {
             name: 'product_variant_id',
             type: 'uuid',
           },
+          {
+            name: 'store_id',
+            type: 'uuid',
+            isNullable: false,
+          },
         ],
       }),
       true,
@@ -40,6 +45,16 @@ export class CreateImageTable1630503939444 implements MigrationInterface {
       new TableForeignKey({
         columnNames: ['product_variant_id'],
         referencedTableName: 'variants', // Ensure 'variant' is the correct name of the table for ProductVariantEntity
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'sizes',
+      new TableForeignKey({
+        columnNames: ['store_id'],
+        referencedTableName: 'stores',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
       }),

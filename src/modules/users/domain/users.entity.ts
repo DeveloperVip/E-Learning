@@ -23,6 +23,11 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ nullable: false, type: 'varchar' })
   email: string;
 
+  @Column({ name: 'confirmation_code', type: 'numeric' })
+  confirmationCode: number;
+  @Column({ name: 'is_confirmed', type: 'boolean' })
+  isConfirmed: boolean;
+
   @Column({ nullable: false, type: 'varchar' })
   @MinLength(8)
   @MaxLength(20)
@@ -33,5 +38,5 @@ export class UserEntity extends BaseEntity implements IUser {
     cascade: true,
     nullable: true,
   })
-  store: StoreEntity;
+  store: StoreEntity[];
 }

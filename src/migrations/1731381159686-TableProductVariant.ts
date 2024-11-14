@@ -69,6 +69,7 @@ export class CreateProductVariantTable1630503939443
           {
             name: 'store_id',
             type: 'uuid',
+            isNullable: false,
           },
         ],
       }),

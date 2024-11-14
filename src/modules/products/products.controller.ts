@@ -23,47 +23,55 @@ export class ProductsController {
   // Get all products
   @Get('GetAllProduct')
   async GetAllProduct() {
-    return this.productsService.findAllProducts();
+    return await this.productsService.findAllProducts();
   }
 
   // Get a product by ID
   @Get('get/:productId')
   async GetProductById(@Param('productId') productId: string) {
-    return this.productsService.findOneProduct(productId);
+    return await this.productsService.findOneProduct(productId);
   }
 
   // Create a product
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Post('create-product/:storeId') // storeId is now a route parameter
+  @Post('/:storeId/create-product') // storeId is now a route parameter
   async CreateProduct(
     @Request() req,
     @Param('storeId') storeId: string,
     @Body() productDetail: ProductsDto, // Get the product details from the body
   ): Promise<ProductResponseDto> {
-    console.log(req); // Optional: for debugging request data
+    console.log(req);
     return await this.productsService.createProducts({
       ...productDetail,
-      storeId: storeId, // Pass the storeId along with product details
+      storeId: storeId,
     });
   }
 
   // Update a product (PATCH)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Patch('update-product/:productId')
+  @Patch('/:storeId/update-product/:productId')
   async UpdateProduct(
     @Param('productId') productId: string,
-    @Body() productDetail: ProductsDto, // Get updated product details from body
+    @Body() productDetail: ProductsDto,
+    @Param('storeId') storeId: string,
   ) {
-    return this.productsService.updateProduct(productId, productDetail);
+    return await this.productsService.updateProduct(
+      storeId,
+      productId,
+      productDetail,
+    );
   }
 
   // Delete a product (DELETE)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Delete(':productId/delete-product')
-  async DeleteProduct(@Param('productId') productId: string) {
-    return this.productsService.deleteProduct(productId);
+  @Delete('/:storeId/delete-product/:productId')
+  async DeleteProduct(
+    @Param('productId') productId: string,
+    @Param('storeId') storeId: string,
+  ) {
+    return await this.productsService.deleteProduct(storeId, productId);
   }
 }

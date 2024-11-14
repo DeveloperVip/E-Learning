@@ -39,6 +39,7 @@ export class CreateSizeTable1630503939443 implements MigrationInterface {
           {
             name: 'store_id',
             type: 'uuid',
+            isNullable: false,
           },
         ],
       }),

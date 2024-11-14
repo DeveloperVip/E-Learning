@@ -10,11 +10,10 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { ProducstEntity } from '@modules/products/domain/products.entity';
-// import { StoreEntity } from '@modules/store/domain/store.entity';
+import { StoreEntity } from '@modules/store/domain/store.entity';
 import { ColorEntity } from '@modules/color-variant/domain/color.entity';
 import { SizeEntity } from '@modules/size-variant/domain/size.entity';
 import { ImageEntity } from './image.entity';
-import { StoreEntity } from '@modules/store/domain/store.entity';
 
 @Entity('variants')
 export class ProductVariantEntity extends BaseEntity {
@@ -23,9 +22,6 @@ export class ProductVariantEntity extends BaseEntity {
 
   @Column()
   price: number;
-
-  //   @Column({ type: 'varchar', length: 255, nullable: true })
-  //   origin?: string;
 
   @Column({ name: 'remaining_quantity', type: 'int' })
   remainingQuantity: number;
@@ -39,6 +35,18 @@ export class ProductVariantEntity extends BaseEntity {
   @Column({ default: false })
   isFeatured: boolean;
 
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+
+  @Column({ name: 'product_id', type: 'uuid' })
+  productId: string;
+
+  @Column({ name: 'color_id', type: 'uuid' })
+  colorId: string;
+
+  @Column({ name: 'size_id', type: 'uuid' }) // Corrected name from 'store_id' to 'size_id'
+  sizeId: string;
+
   @ManyToOne(() => ProducstEntity, (product) => product.productVariants)
   @JoinColumn({ name: 'product_id' })
   product: ProducstEntity;
@@ -50,10 +58,6 @@ export class ProductVariantEntity extends BaseEntity {
   @ManyToOne(() => SizeEntity, (size) => size.productVariants)
   @JoinColumn({ name: 'size_id' })
   size: SizeEntity;
-
-  //   @ManyToOne(() => Storage, (storage) => storage.variants)
-  //   @JoinColumn({ name: 'storageId' })
-  //   storage: Storage;
 
   @ManyToOne(() => StoreEntity, (store) => store.productVariants)
   @JoinColumn({ name: 'store_id' })

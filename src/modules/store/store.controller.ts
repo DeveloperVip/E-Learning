@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
@@ -20,6 +21,16 @@ import { StoreCreateDTO } from './dto/store.dto';
 export class StoreController {
   constructor(private readonly StoreService: StoreService) {}
 
+  @Get('get')
+  async getAllStore() {
+    return await this.StoreService.findAll();
+  }
+
+  @Get('get/:id')
+  async getByIdStore(@Param('id') id: string) {
+    return await this.StoreService.findById(id);
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('create')
@@ -29,12 +40,14 @@ export class StoreController {
     @Request() req,
   ) {
     try {
-      if (req.user.data) {
+      console.log(req.user);
+      if (!req.user.userId) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
+
       const storeData = {
         ...data,
-        userId: req.user.data,
+        userId: req.user.userId,
       };
       return this.StoreService.CreateStore(storeData);
     } catch (err) {
@@ -56,7 +69,7 @@ export class StoreController {
     const storeData = {
       ...data,
       id: storeId,
-      userId: req.user.data,
+      userId: req.user.userId,
     };
     return this.StoreService.UpdateStore(storeData);
   }
@@ -70,7 +83,7 @@ export class StoreController {
   ) {
     const storeData = {
       id: storeId,
-      userId: req.user.data,
+      userId: req.user.userId,
     };
     return this.StoreService.DeleteStore(storeData);
   }

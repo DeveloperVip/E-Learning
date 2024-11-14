@@ -12,8 +12,10 @@ import {
 import { CategoriesService } from './categories.service';
 import { UpdateCategoryDTO } from './dto/update.dto';
 import { CreateCategoryDTO } from './dto/create.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('categories')
+@ApiTags('categories')
 export class CategoriesController {
   constructor(private readonly CategoriesService: CategoriesService) {}
 
@@ -27,10 +29,19 @@ export class CategoriesController {
     return await this.CategoriesService.findById(id);
   }
 
-  @Post('create')
+  @Post('create/:storeId/:billboardId')
   @HttpCode(HttpStatus.CREATED)
-  async createCategory(@Body() data: CreateCategoryDTO) {
-    return await this.CategoriesService.create(data);
+  async createCategory(
+    @Body() data: CreateCategoryDTO,
+    @Param('storeId') storeId: string,
+    @Param('billboardId') billboardId: string,
+  ) {
+    const dataCategory = {
+      ...data,
+      storeId,
+      billboardId,
+    };
+    return await this.CategoriesService.create(dataCategory);
   }
 
   @Put('update/:id')

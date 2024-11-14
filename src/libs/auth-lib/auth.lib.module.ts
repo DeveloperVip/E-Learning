@@ -6,7 +6,7 @@ import { LocalStratery } from './stratery/local.stratery';
 import { JwtStrategy } from './stratery/jwt.stratery';
 import { UsersModule } from 'src/modules/users/users.module';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { EmailService } from '@shared';
 
 @Module({
@@ -19,16 +19,18 @@ import { EmailService } from '@shared';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) =>
-        // console.log(configService.get<string>('JWT_SECRET')),
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<JwtModuleOptions> =>
+        // console.log(configService.get<string>('SECRETKEY')),
         ({
-          secret: configService.get<string>('JWT_SECRET'),
+          global: true,
+          secret: configService.get<string>('SECRETKEY'),
           signOptions: {
             expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '60s',
           },
         }),
     }),
-    JwtModule,
   ],
   providers: [
     AuthService,

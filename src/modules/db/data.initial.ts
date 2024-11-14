@@ -21,7 +21,8 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
       schema: configService.get<string>('database.schema'),
       migrations: [`dist/migrations/**/*{.ts,.js}`],
       // migrationsRun: true,
-      synchronize: true,
+      // synchronize: true,
+      autoLoadEntities: true,
     };
   },
 };
