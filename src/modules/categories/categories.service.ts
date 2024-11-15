@@ -75,8 +75,8 @@ export class CategoriesService {
   }
 
   async delete(id: string) {
-    const result = await this.categoryRepository.delete(id);
-    if (result.affected === 0) {
+    const result = await this.findById(id);
+    if (!result[0]) {
       throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
     }
     return {

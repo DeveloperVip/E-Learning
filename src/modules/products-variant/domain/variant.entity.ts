@@ -14,13 +14,13 @@ import { StoreEntity } from '@modules/store/domain/store.entity';
 import { ColorEntity } from '@modules/color-variant/domain/color.entity';
 import { SizeEntity } from '@modules/size-variant/domain/size.entity';
 import { ImageEntity } from './image.entity';
-
+import { OrderItemEntity } from '@modules/order-items/domain/orderItem.entity';
 @Entity('variants')
 export class ProductVariantEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'numeric', default: 0 })
   price: number;
 
   @Column({ name: 'remaining_quantity', type: 'int' })
@@ -67,6 +67,9 @@ export class ProductVariantEntity extends BaseEntity {
     cascade: true,
   })
   images: ImageEntity[];
+
+  @OneToMany(() => OrderItemEntity, (orderItems) => orderItems.product)
+  orderItems: OrderItemEntity[];
 
   @CreateDateColumn({
     name: 'create_at',

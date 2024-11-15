@@ -20,6 +20,9 @@ import { BrandModule } from '@modules/brand/brand.module';
 import { CategoriesModule } from '@modules/categories/categories.module';
 import { BillboardModule } from '@modules/billboard/billboard.module';
 import { ProductVariantModule } from '@modules/products-variant/variant.module';
+import { OrderModule } from '@modules/order/order.module';
+import { OrderItemModule } from '@modules/order-items/orderItem.module';
+import { CartModule } from '@modules/cart/cart.module';
 
 // import { JwtModule } from '@nestjs/jwt';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -42,6 +45,9 @@ import { ProductVariantModule } from '@modules/products-variant/variant.module';
     CategoriesModule,
     BillboardModule,
     ProductVariantModule,
+    OrderModule,
+    OrderItemModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CloudinaryService],

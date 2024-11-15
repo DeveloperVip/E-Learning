@@ -24,6 +24,7 @@ export class CreateProductVariantTable1630503939443
           {
             name: 'price',
             type: 'numeric',
+            default: '0',
           },
           {
             name: 'remaining_quantity',
