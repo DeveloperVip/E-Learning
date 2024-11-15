@@ -7,11 +7,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiProperty, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/libs/auth-lib/auth.lib.service';
 import { LocalAuthGuard } from 'src/libs/auth-lib/local-auth.guard';
 import { LoginDto } from '../users/dto/login-user.dto';
 import { CreateUserDto } from '@modules/users/dto/create-user.dto';
+import { AuthenticateCreateUserDto } from './dto/auth.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -41,8 +42,9 @@ export class AuthController {
   }
 
   @Post('/authenticate-account')
+  @ApiProperty({ type: AuthenticateCreateUserDto })
   public async authenticateCreateUser(
-    @Body() body,
+    @Body() body: AuthenticateCreateUserDto,
     @Query('email') email: string,
   ) {
     return await this.AuthLibService.authenticateCreateUser(
