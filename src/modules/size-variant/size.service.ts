@@ -13,44 +13,59 @@ export class SizeService {
   ) {}
 
   public async getSizeById(id: string) {
-    const size = await this.SizeRepository.findOne({
-      where: { id },
-      relations: ['store'],
-    });
+    const size: SizeEntity = await this.SizeRepository.createQueryBuilder(
+      'size',
+    )
+      .leftJoinAndSelect('size.store', 'store')
+      .select(['size', 'store.name', 'store.id'])
+      .where('size.id= :id', { id })
+      .getOne();
     if (!size) throw new HttpException('Size not found', HttpStatus.NOT_FOUND);
     return size;
   }
 
   public async getSizeAll() {
-    return this.SizeRepository.find();
+    const size = await this.SizeRepository.createQueryBuilder('size')
+      .leftJoinAndSelect('size.store', 'store')
+      .select(['size', 'store.name', 'store.id'])
+      .getMany();
+    if (!size) throw new HttpException('Size not found', HttpStatus.NOT_FOUND);
+    return size;
+  }
+
+  async findByUser(storeId: string) {
+    const size = await this.SizeRepository.createQueryBuilder('size')
+      .leftJoinAndSelect('size.store', 'store')
+      .select(['size', 'store.name', 'store.id'])
+      .where('size.storeId= :storeId', { storeId })
+      .getMany();
+    if (!size) throw new HttpException('size not found', HttpStatus.NOT_FOUND);
+    return size;
   }
 
   public async createSize(data: CreateSizeDTO) {
-    const size = this.SizeRepository.findOne({ where: { name: data.name } });
-    if (size) throw new HttpException('Size existed', HttpStatus.CONFLICT);
+    const size = await this.SizeRepository.createQueryBuilder('size')
+      .select(['size'])
+      .where('size.name= :name', { name: data.name })
+      .getOne();
+    if (size) throw new HttpException('Size was existed', HttpStatus.CONFLICT);
     const newSize = await this.SizeRepository.save({
       ...data,
-      store: { id: data.storeId },
+      storeId: data.storeId,
     });
-    if (newSize) throw new HttpException('Size created', HttpStatus.CREATED);
+    return newSize;
   }
 
   public async deleteSize(data: DeleteSizeDTO) {
-    // Kiểm tra nếu storeId không tồn tại
-    if (!data.storeId) {
-      throw new HttpException('Store ID not provided', HttpStatus.BAD_REQUEST);
+    const size = await this.getSizeById(data.id);
+    if (size && data.storeId === size.storeId) {
+      const deletedSize = await this.SizeRepository.remove(size);
+      if (deletedSize[0])
+        return {
+          message: 'size deleted successfully',
+          status: HttpStatus.ACCEPTED,
+        };
     }
-
-    const size = await this.SizeRepository.findOne({
-      where: { id: data.id, store: { id: data.storeId } },
-    });
-
-    if (!size) {
-      throw new HttpException('Size not found', HttpStatus.NOT_FOUND);
-    }
-
-    await this.SizeRepository.remove(size);
-
-    return { message: 'Size deleted successfully' };
+    throw new HttpException('Size not found', HttpStatus.NOT_FOUND); // Nếu không tìm thấy color
   }
 }

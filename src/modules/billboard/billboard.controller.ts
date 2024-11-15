@@ -11,7 +11,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiProperty, ApiTags, OmitType } from '@nestjs/swagger';
 import { CreateBillboardDTO } from './dto/billboard.dto';
 import { BillboardEntity } from './domain/billboard.entity';
 
@@ -22,11 +22,11 @@ export class BillboardController {
 
   @Get('get-all')
   async getAllBillboards(): Promise<BillboardEntity[]> {
-    return this.BillboardService.findAll(); // Gọi service để lấy tất cả các bảng quảng cáo
+    return await this.BillboardService.findAll(); // Gọi service để lấy tất cả các bảng quảng cáo
   }
 
   // Endpoint lấy bảng quảng cáo theo ID
-  @Get('/get:id')
+  @Get('/get/:id')
   async getBillboardById(@Param('id') id: string): Promise<BillboardEntity> {
     const billboard = await this.BillboardService.findOne(id); // Gọi service để lấy bảng quảng cáo theo ID
 
@@ -39,19 +39,23 @@ export class BillboardController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Post('create')
-  @ApiProperty({ type: CreateBillboardDTO })
-  public async create(@Body() data, @Param() storeId: string) {
+  @Post('create/:storeId')
+  @ApiProperty({ type: OmitType(CreateBillboardDTO, ['storeId'] as const) })
+  public async create(
+    @Body() data: CreateBillboardDTO,
+    @Param('storeId') storeId: string,
+  ) {
+    console.log('🚀 ~ BillboardController ~ storeId:', storeId);
     const dataBillboard: CreateBillboardDTO = {
       ...data,
-      storeId,
+      storeId: storeId,
     };
     await this.BillboardService.createBillboard(dataBillboard);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @Put('/:id')
   async updateBillboard(
     @Param('id') id: string,
     @Body() updateData: Partial<BillboardEntity>,
@@ -62,7 +66,7 @@ export class BillboardController {
   // Endpoint xóa bảng quảng cáo
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete('/:id')
   async deleteBillboard(@Param('id') id: string): Promise<void> {
     return this.BillboardService.remove(id); // Gọi service để xóa bảng quảng cáo
   }

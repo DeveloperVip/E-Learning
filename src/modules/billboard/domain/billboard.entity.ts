@@ -15,7 +15,9 @@ import { CategoryEntity } from '@modules/categories/domain/categories.entity';
 
 @Entity('billboards')
 export class BillboardEntity extends BaseEntity implements IBillboard {
+  @Column({ name: 'store_id', type: 'uuid', nullable: false })
   storeId: string;
+
   @PrimaryGeneratedColumn('uuid') // Sử dụng UUID cho ID của bảng billboard
   id: string;
 

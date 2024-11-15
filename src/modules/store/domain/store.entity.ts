@@ -27,6 +27,9 @@ export class StoreEntity extends BaseEntity implements IStore {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ name: 'user_id', type: 'uuid' })
+  userId: string;
+
   @ManyToOne(() => UserEntity, (user) => user.store)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;

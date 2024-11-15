@@ -39,6 +39,7 @@ export class CreateCategoryTable1630503939443 implements MigrationInterface {
           {
             name: 'store_id',
             type: 'uuid',
+            isNullable: false,
           },
           {
             name: 'billboard_id',

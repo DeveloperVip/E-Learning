@@ -51,65 +51,98 @@ export class ProductsService {
 
   // Lấy tất cả sản phẩm
   public async findAllProducts() {
-    return this.productsRepository.find({
-      relations: ['store', 'brand', 'categories'], // Lấy thông tin của store, brand và category
-    });
+    const product = await this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'categories')
+      .select([
+        'product',
+        'store.name',
+        'store.id',
+        'brand.name',
+        'brand.id',
+        'categories.name',
+        'categories.id',
+      ])
+      .getMany();
+    if (!product)
+      throw new HttpException('product not found', HttpStatus.NOT_FOUND);
+    return product;
   }
 
   // Lấy sản phẩm theo ID
   public async findOneProduct(productId: string) {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-      relations: ['store', 'brand', 'categories'], // Lấy thông tin của store, brand và category
-    });
+    const product = await this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.store', 'store')
+      .leftJoinAndSelect('product.brand', 'brand')
+      .leftJoinAndSelect('product.categories', 'categories')
+      .select([
+        'product',
+        'store.name',
+        'store.id',
+        'brand.name',
+        'brand.id',
+        'categories.name',
+        'categories.id',
+      ])
+      .where('product.id = :productId', { productId: productId })
+      .getOne();
 
     if (!product) {
-      return {
-        data: null,
-        message: 'Product not found.',
-        status: statusResponses.FAIL,
-      };
+      throw new HttpException('product not found', HttpStatus.NOT_FOUND);
     }
 
-    return {
-      data: product,
-      message: 'Product found.',
-      status: statusResponses.SUCCESS,
-    };
+    return product;
   }
 
-  public async updateProduct(productId: string, productDetail: ProductsDto) {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-    });
+  public async updateProduct(
+    storeId: string,
+    productId: string,
+    productDetail: ProductsDto,
+  ) {
+    const product = await this.findOneProduct(productId);
     if (!product) {
       throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
     }
 
-    await this.productsRepository.update(productId, productDetail);
-    const updatedProduct = await this.productsRepository.findOne({
-      where: { id: productId },
-    });
-    return {
-      data: updatedProduct,
-      message: 'Product updated successfully',
-      status: statusResponses.SUCCESS,
-    };
+    if (storeId === product.storeId) {
+      const updateProduct = await this.productsRepository.update(
+        productId,
+        productDetail,
+      );
+      if (updateProduct) {
+        return {
+          data: updateProduct,
+          message: 'Product updated successfully',
+          status: statusResponses.SUCCESS,
+        };
+      }
+    }
+    throw new HttpException(
+      'Error internal server',
+      HttpStatus.EXPECTATION_FAILED,
+    );
   }
 
-  public async deleteProduct(productId: string) {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-    });
+  public async deleteProduct(storeId: string, productId: string) {
+    const product = await this.findOneProduct(productId);
     if (!product) {
       throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
     }
-
-    await this.productsRepository.delete(productId);
-    return {
-      data: null,
-      message: 'Product deleted successfully',
-      status: statusResponses.SUCCESS,
-    };
+    if (storeId === product.storeId) {
+      const deleteProduct = await this.productsRepository.remove(product);
+      if (deleteProduct[0])
+        return {
+          data: null,
+          message: 'Product deleted successfully',
+          status: statusResponses.SUCCESS,
+        };
+    } else
+      throw new HttpException(
+        'Error internal server',
+        HttpStatus.EXPECTATION_FAILED,
+      );
   }
 }

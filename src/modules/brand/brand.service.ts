@@ -13,9 +13,20 @@ export class BrandService {
 
   // Tạo mới Brand
   public async createBrand(createBrandDTO: CreateBrandDTO) {
-    const existingBrand = await this.brandRepository.findOne({
-      where: { name: createBrandDTO.name },
-    });
+    console.log(
+      '🚀 ~ BrandService ~ createBrand ~ createBrand:',
+      createBrandDTO,
+    );
+    const existingBrand = await this.brandRepository
+      .createQueryBuilder('brand')
+      .leftJoinAndSelect('brand.store', 'store')
+      .select(['brand', 'store.name', 'store.id'])
+      .where('brand.name = :name', { name: createBrandDTO.name })
+      .getOne();
+    console.log(
+      '🚀 ~ BrandService ~ createBrand ~ existingBrand:',
+      existingBrand,
+    );
     if (existingBrand) {
       throw new HttpException('Brand already exists', HttpStatus.CONFLICT);
     }
@@ -25,10 +36,12 @@ export class BrandService {
 
   // Lấy thông tin Brand theo ID
   public async getBrandById(id: string) {
-    const brand = await this.brandRepository.findOne({
-      where: { id },
-      relations: ['store'],
-    });
+    const brand = await this.brandRepository
+      .createQueryBuilder('brand')
+      .leftJoinAndSelect('brand.store', 'store')
+      .select(['brand', 'store.name', 'store.id'])
+      .where('brand.id = :id', { id: id })
+      .getOne();
     if (!brand) {
       throw new HttpException('Brand not found', HttpStatus.NOT_FOUND);
     }
@@ -37,14 +50,20 @@ export class BrandService {
 
   // Lấy tất cả các Brand
   public async getAllBrands() {
-    return await this.brandRepository.find({
-      relations: ['store'],
-    });
+    const existingBrand = await this.brandRepository
+      .createQueryBuilder('brand')
+      .leftJoinAndSelect('brand.store', 'store')
+      .select(['brand', 'store.name', 'store.id'])
+      .getMany();
+    if (!existingBrand) {
+      throw new HttpException('No brand', HttpStatus.NOT_FOUND);
+    }
+    return existingBrand;
   }
 
   // Xóa Brand theo ID
   public async deleteBrand(id: string) {
-    const brand = await this.brandRepository.findOne({ where: { id } });
+    const brand = await this.getBrandById(id);
     if (!brand) {
       throw new HttpException('Brand not found', HttpStatus.NOT_FOUND);
     }

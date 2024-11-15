@@ -21,6 +21,12 @@ export class CategoryEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+
+  @Column({ name: 'billboard_id', type: 'uuid' })
+  billboardId: string;
+
   @ManyToOne(() => StoreEntity, (store) => store.categories, {
     onDelete: 'CASCADE',
   })

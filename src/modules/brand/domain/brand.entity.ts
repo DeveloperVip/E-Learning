@@ -20,6 +20,9 @@ export class BrandEntity extends BaseEntity {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ name: 'store_id', type: 'uuid' })
+  storeId: string;
+
   @ManyToOne(() => StoreEntity, (store) => store.brands, {
     onDelete: 'CASCADE',
   })

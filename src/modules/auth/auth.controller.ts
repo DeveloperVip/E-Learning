@@ -1,12 +1,22 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Post,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { AuthService } from 'src/libs/auth-lib/auth.lib.service';
 import { LocalAuthGuard } from 'src/libs/auth-lib/local-auth.guard';
 import { LoginDto } from '../users/dto/login-user.dto';
+import { CreateUserDto } from '@modules/users/dto/create-user.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
+  private logger = new Logger(AuthController.name);
   constructor(private readonly AuthLibService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
@@ -14,6 +24,7 @@ export class AuthController {
   @ApiBody({ type: LoginDto })
   async login(@Request() req) {
     try {
+      this.logger.log(req.user.data);
       return this.AuthLibService.login(req.user.data);
     } catch (error) {
       return {
@@ -21,5 +32,22 @@ export class AuthController {
         message: error.message || 'An error occurred during login',
       };
     }
+  }
+
+  @Post('/create-user')
+  public async createUser(@Body() userInfo: CreateUserDto) {
+    // this.logger.log('user', userInfo);
+    return await this.AuthLibService.createUser(userInfo);
+  }
+
+  @Post('/authenticate-account')
+  public async authenticateCreateUser(
+    @Body() body,
+    @Query('email') email: string,
+  ) {
+    return await this.AuthLibService.authenticateCreateUser(
+      email,
+      body.confirmationCode,
+    );
   }
 }

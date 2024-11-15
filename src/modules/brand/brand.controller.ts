@@ -1,15 +1,24 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { BrandService } from './brand.service';
 import { CreateBrandDTO } from './dto/create.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('brands')
+@ApiTags('Brand')
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   // Tạo mới Brand
-  @Post('create')
-  public async createBrand(@Body() createBrandDTO: CreateBrandDTO) {
-    return await this.brandService.createBrand(createBrandDTO);
+  @Post('create/:storeId')
+  public async createBrand(
+    @Body() createBrandDTO: CreateBrandDTO,
+    @Param('storeId') storeId: string,
+  ) {
+    const dataBrand: CreateBrandDTO = {
+      ...createBrandDTO,
+      storeId: storeId,
+    };
+    return await this.brandService.createBrand(dataBrand);
   }
 
   // Lấy thông tin Brand theo ID

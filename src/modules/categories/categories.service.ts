@@ -13,16 +13,36 @@ export class CategoriesService {
   ) {}
 
   async findAll() {
-    return await this.categoryRepository.find({
-      relations: ['store', 'billboard'],
-    });
+    return await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.store', 'store')
+      .leftJoinAndSelect('category.billboard', 'billboard')
+      .select([
+        'category',
+        'store.name',
+        'store.id',
+        'billboard.imageUrl',
+        'billboard.label',
+        'billboard.id',
+      ])
+      .getMany();
   }
 
   async findById(id: string) {
-    const category = await this.categoryRepository.findOne({
-      where: { id },
-      relations: ['store', 'billboard'],
-    });
+    const category = await this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.store', 'store')
+      .leftJoinAndSelect('category.billboard', 'billboard')
+      .select([
+        'category',
+        'store.name',
+        'store.id',
+        'billboard.imageUrl',
+        'billboard.label',
+        'billboard.id',
+      ])
+      .where('category.id = :id', { id })
+      .getOne();
     if (!category) {
       throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
     }
@@ -30,10 +50,10 @@ export class CategoriesService {
   }
 
   async create(data: CreateCategoryDTO) {
-    const category = this.categoryRepository.create({
+    const category = await this.categoryRepository.create({
       ...data,
-      store: { id: data.storeId },
-      billboard: { id: data.billboardId },
+      storeId: data.storeId,
+      billboardId: data.billboardId,
     });
     return await this.categoryRepository.save(category);
   }
@@ -46,19 +66,22 @@ export class CategoriesService {
 
     const updatedCategory = await this.categoryRepository.save({
       ...category,
-      ...data,
-      store: { id: data.storeId },
-      billboard: { id: data.billboardId },
+      name: data.name,
+      storeId: data.storeId,
+      billboardId: data.billboardId,
     });
 
     return updatedCategory;
   }
 
   async delete(id: string) {
-    const result = await this.categoryRepository.delete(id);
-    if (result.affected === 0) {
+    const result = await this.findById(id);
+    if (!result[0]) {
       throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
     }
-    return { message: 'Category deleted successfully' };
+    return {
+      message: 'Category deleted successfully',
+      status: HttpStatus.ACCEPTED,
+    };
   }
 }

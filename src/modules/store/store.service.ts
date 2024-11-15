@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StoreEntity } from './domain/store.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { UpdateStoreDto } from './dto/update.dto';
 
 @Injectable()
 export class StoreService {
+  private logger = new Logger(StoreService.name);
   constructor(
     @InjectRepository(StoreEntity)
     private readonly StorageRespository: Repository<StoreEntity>,
@@ -14,7 +15,11 @@ export class StoreService {
 
   //find store by id
   public async findById(id: string) {
-    const store = this.StorageRespository.findOne({ where: { id: id } });
+    const store = await this.StorageRespository.createQueryBuilder('store')
+      .leftJoinAndSelect('store.user', 'user')
+      .select(['store', 'user.id', 'user.email', 'user.userName'])
+      .where('store.id = :id', { id })
+      .getMany();
     if (!store) {
       throw new HttpException(`Store not found`, HttpStatus.NOT_FOUND);
     }
@@ -23,17 +28,23 @@ export class StoreService {
 
   //find all store
   public async findAll() {
-    const store = this.StorageRespository.find();
-    if (!store) throw new HttpException('Not have store', HttpStatus.NOT_FOUND);
+    const store = await this.StorageRespository.createQueryBuilder('store')
+      .leftJoinAndSelect('store.user', 'user')
+      .select(['store', 'user.id', 'user.email', 'user.userName'])
+      .getMany();
+    this.logger.log(store);
+    if (store.length === 0)
+      throw new HttpException('Not have store', HttpStatus.NOT_FOUND);
     return store;
   }
 
   //create store
   public async CreateStore(data: StoreCreateDTO) {
-    const existStore = this.StorageRespository.find({
+    const existStore = await this.StorageRespository.find({
       where: { name: data.name },
     });
-    if (existStore) {
+    this.logger.log(existStore);
+    if (existStore.length !== 0) {
       return new HttpException('Store was existed', HttpStatus.CONFLICT);
     }
     return await this.StorageRespository.save({

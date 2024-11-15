@@ -4,9 +4,13 @@ import { ProductVariantEntity } from './domain/variant.entity';
 import { ProductVariantController } from './variant.controller';
 import { ProductVariantService } from './variant.service';
 import { ImageEntity } from './domain/image.entity';
+import { AuthLibModule } from '@libs/auth-lib/auth.lib.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProductVariantEntity, ImageEntity])],
+  imports: [
+    TypeOrmModule.forFeature([ProductVariantEntity, ImageEntity]),
+    AuthLibModule,
+  ],
   controllers: [ProductVariantController],
   providers: [ProductVariantService],
   exports: [],

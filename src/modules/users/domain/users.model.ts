@@ -6,4 +6,6 @@ export interface IUser {
   password: string;
   createAt?: Date;
   updateAt?: Date;
+  confirmationCode?: number;
+  isConfirmed?: boolean;
 }

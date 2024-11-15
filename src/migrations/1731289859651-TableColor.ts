@@ -41,6 +41,7 @@ export class TableColor1731289859651 implements MigrationInterface {
           {
             name: 'store_id',
             type: 'uuid',
+            isNullable: false,
           },
         ],
       }),
@@ -60,7 +61,7 @@ export class TableColor1731289859651 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('colors');
-    const foreignKey = table.foreignKeys.find(
+    const foreignKey = await table.foreignKeys.find(
       (fk) => fk.columnNames.indexOf('store_id') !== -1,
     );
     if (foreignKey) await queryRunner.dropForeignKey('colors', foreignKey);
