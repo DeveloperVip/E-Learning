@@ -57,6 +57,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'categories')
       .leftJoinAndSelect('product.productVariants', 'productVariants')
+      .leftJoinAndSelect('productVariants.images', 'images')
       .select([
         'product',
         'store.name',
@@ -65,7 +66,8 @@ export class ProductsService {
         'brand.id',
         'categories.name',
         'categories.id',
-        'productVariants',
+        'productVariants.price',
+        'images.url',
       ])
       .getMany();
     if (!product)
@@ -80,6 +82,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'categories')
+      .leftJoinAndSelect('product.productVariants', 'productVariants')
       .select([
         'product',
         'store.name',
@@ -88,6 +91,8 @@ export class ProductsService {
         'brand.id',
         'categories.name',
         'categories.id',
+        'productVariants.price',
+        'images.url',
       ])
       .where('product.id = :productId', { productId: productId })
       .getOne();
