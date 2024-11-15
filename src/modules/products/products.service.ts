@@ -56,6 +56,7 @@ export class ProductsService {
       .leftJoinAndSelect('product.store', 'store')
       .leftJoinAndSelect('product.brand', 'brand')
       .leftJoinAndSelect('product.categories', 'categories')
+      .leftJoinAndSelect('product.productVariants', 'productVariants')
       .select([
         'product',
         'store.name',
@@ -64,6 +65,7 @@ export class ProductsService {
         'brand.id',
         'categories.name',
         'categories.id',
+        'productVariants',
       ])
       .getMany();
     if (!product)
