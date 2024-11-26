@@ -39,7 +39,7 @@ export class ProductsController {
   async CreateProduct(
     @Request() req,
     @Param('storeId') storeId: string,
-    @Body() productDetail: ProductsDto, // Get the product details from the body
+    @Body() productDetail: Omit<ProductsDto, 'storeId'>, // Get the product details from the body
   ): Promise<ProductResponseDto> {
     console.log(req);
     return await this.productsService.createProducts({

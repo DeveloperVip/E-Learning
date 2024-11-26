@@ -53,6 +53,11 @@ export class TableProduct1731379889045 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'is_deleted',
+            type: 'boolean',
+            default: false,
+          },
+          {
             name: 'create_at',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
@@ -67,8 +72,10 @@ export class TableProduct1731379889045 implements MigrationInterface {
       }),
       true,
     );
+
+    // Foreign Key for store_id
     await queryRunner.createForeignKey(
-      'colors',
+      'products',
       new TableForeignKey({
         columnNames: ['store_id'],
         referencedTableName: 'stores',
@@ -77,8 +84,9 @@ export class TableProduct1731379889045 implements MigrationInterface {
       }),
     );
 
+    // Foreign Key for brand_id
     await queryRunner.createForeignKey(
-      'colors',
+      'products',
       new TableForeignKey({
         columnNames: ['brand_id'],
         referencedTableName: 'brands',
@@ -87,8 +95,9 @@ export class TableProduct1731379889045 implements MigrationInterface {
       }),
     );
 
+    // Foreign Key for categories_id
     await queryRunner.createForeignKey(
-      'colors',
+      'products',
       new TableForeignKey({
         columnNames: ['categories_id'],
         referencedTableName: 'categories',
@@ -100,24 +109,29 @@ export class TableProduct1731379889045 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const foreignKeys = await queryRunner.getTable('products');
+
+    // Drop Foreign Key for store_id
     const storeForeignKey = foreignKeys.foreignKeys.find(
       (fk) => fk.columnNames.indexOf('store_id') !== -1,
     );
     if (storeForeignKey)
       await queryRunner.dropForeignKey('products', storeForeignKey);
 
+    // Drop Foreign Key for brand_id
     const brandForeignKey = foreignKeys.foreignKeys.find(
       (fk) => fk.columnNames.indexOf('brand_id') !== -1,
     );
     if (brandForeignKey)
       await queryRunner.dropForeignKey('products', brandForeignKey);
 
+    // Drop Foreign Key for categories_id
     const categoryForeignKey = foreignKeys.foreignKeys.find(
       (fk) => fk.columnNames.indexOf('categories_id') !== -1,
     );
     if (categoryForeignKey)
       await queryRunner.dropForeignKey('products', categoryForeignKey);
 
+    // Drop the table
     await queryRunner.dropTable('products');
   }
 }

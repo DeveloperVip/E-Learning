@@ -18,6 +18,7 @@ import { BrandEntity } from '@modules/brand/domain/brand.entity';
 import { ColorEntity } from '@modules/color-variant/domain/color.entity';
 import { SizeEntity } from '@modules/size-variant/domain/size.entity';
 import { ProductVariantEntity } from '@modules/products-variant/domain/variant.entity';
+import { PromotionEntity } from '@modules/promotion/domain/promotion.entity';
 
 @Entity('stores')
 export class StoreEntity extends BaseEntity implements IStore {
@@ -33,6 +34,11 @@ export class StoreEntity extends BaseEntity implements IStore {
   @ManyToOne(() => UserEntity, (user) => user.store)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
+
+  @OneToMany(() => PromotionEntity, (promotion) => promotion.product, {
+    cascade: true,
+  })
+  promotions: PromotionEntity[];
 
   @OneToMany(() => ProducstEntity, (product) => product.store, {
     cascade: true,

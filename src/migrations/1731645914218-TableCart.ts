@@ -45,6 +45,7 @@ export class TableCart1731645914218 implements MigrationInterface {
       }),
     );
 
+    // Add foreign key for 'user_id' column referencing the 'users' table
     await queryRunner.createForeignKey(
       'carts',
       new TableForeignKey({
@@ -57,6 +58,8 @@ export class TableCart1731645914218 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop the foreign key and the table
+    await queryRunner.dropForeignKey('carts', 'FK_carts_user_id'); // Make sure to use the correct foreign key name
     await queryRunner.dropTable('carts');
   }
 }

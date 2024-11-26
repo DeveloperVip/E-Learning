@@ -12,6 +12,7 @@ import {
 import { StoreEntity } from '@modules/store/domain/store.entity';
 import { BillboardEntity } from '@modules/billboard/domain/billboard.entity';
 import { ProducstEntity } from '@modules/products/domain/products.entity';
+import { PromotionEntity } from '@modules/promotion/domain/promotion.entity';
 
 @Entity('categories')
 export class CategoryEntity extends BaseEntity {
@@ -43,6 +44,11 @@ export class CategoryEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   products: ProducstEntity[];
+
+  @OneToMany(() => PromotionEntity, (promotion) => promotion.category, {
+    cascade: true,
+  })
+  promotions: PromotionEntity[];
 
   @CreateDateColumn({
     name: 'create_at',

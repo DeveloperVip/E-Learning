@@ -14,6 +14,7 @@ import { StoreEntity } from '@modules/store/domain/store.entity';
 import { ProductVariantEntity } from '@modules/products-variant/domain/variant.entity';
 import { CategoryEntity } from '@modules/categories/domain/categories.entity';
 import { BrandEntity } from '@modules/brand/domain/brand.entity';
+import { PromotionEntity } from '@modules/promotion/domain/promotion.entity';
 
 @Entity('products')
 export class ProducstEntity extends BaseEntity implements IProducts {
@@ -40,6 +41,12 @@ export class ProducstEntity extends BaseEntity implements IProducts {
   @Column({ name: 'categories_id', type: 'uuid' })
   categoriesId: string;
 
+  @Column({ name: 'is_deleted', type: 'boolean', default: false })
+  isDeleted: boolean;
+
+  // @Column({ name: 'promotion', type: 'int', nullable: true })
+  // promotion: number;
+
   @ManyToOne(() => StoreEntity, (store) => store.products)
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
@@ -60,6 +67,11 @@ export class ProducstEntity extends BaseEntity implements IProducts {
     },
   )
   productVariants: ProductVariantEntity[];
+
+  @OneToMany(() => PromotionEntity, (promotion) => promotion.product, {
+    cascade: true,
+  })
+  promotions: PromotionEntity[];
 
   @CreateDateColumn({
     name: 'create_at',

@@ -49,7 +49,7 @@ export class StoreController {
         ...data,
         userId: req.user.userId,
       };
-      return this.StoreService.CreateStore(storeData);
+      return this.StoreService.createStore(storeData);
     } catch (err) {
       throw new HttpException(
         `Error internal server: ${err.detail}`,
@@ -71,7 +71,7 @@ export class StoreController {
       id: storeId,
       userId: req.user.userId,
     };
-    return this.StoreService.UpdateStore(storeData);
+    return this.StoreService.updateStore(storeData);
   }
 
   @ApiBearerAuth()
@@ -85,6 +85,6 @@ export class StoreController {
       id: storeId,
       userId: req.user.userId,
     };
-    return this.StoreService.DeleteStore(storeData);
+    return this.StoreService.deleteStore(storeData);
   }
 }

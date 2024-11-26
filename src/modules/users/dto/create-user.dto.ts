@@ -30,7 +30,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(8)
   @MaxLength(20)
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,} $/)
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/)
   password: string;
 
   confirmationCode?: number;

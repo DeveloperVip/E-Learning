@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsArray,
   IsString,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateProductVariantDto {
@@ -54,12 +55,8 @@ export class CreateProductVariantDto {
   @IsBoolean()
   isFeatured: boolean;
 
-  @IsUUID()
-  @IsNotEmpty()
   storeId: string;
 
-  @IsUUID()
-  @IsNotEmpty()
   productId: string;
 
   @ApiProperty({
@@ -87,4 +84,23 @@ export class CreateProductVariantDto {
   @IsString({ each: true })
   @IsOptional()
   imageUrls: string[];
+
+  @ApiProperty({
+    description:
+      'The type of promotion for the product variant (fixed or percent)',
+    enum: ['fixed', 'percent'],
+    default: 'fixed',
+  })
+  @IsEnum(['fixed', 'percent'])
+  @IsOptional()
+  promotionType: 'fixed' | 'percent';
+
+  @ApiProperty({
+    description: 'The value of the promotion (amount or percentage)',
+    type: Number,
+    default: 0,
+  })
+  @IsNumber()
+  @IsOptional()
+  promotionValue: number;
 }

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { StoreEntity } from '@modules/store/domain/store.entity';
 import { ProducstEntity } from '@modules/products/domain/products.entity';
+import { PromotionEntity } from '@modules/promotion/domain/promotion.entity';
 
 @Entity('brands')
 export class BrandEntity extends BaseEntity {
@@ -33,6 +34,11 @@ export class BrandEntity extends BaseEntity {
     onDelete: 'CASCADE',
   })
   products: ProducstEntity[];
+
+  @OneToMany(() => PromotionEntity, (promotion) => promotion.brand, {
+    cascade: true,
+  })
+  promotions: PromotionEntity[];
 
   @CreateDateColumn({
     name: 'create_at',

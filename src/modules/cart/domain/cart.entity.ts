@@ -8,8 +8,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToOne,
+  // ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 
 @Entity('carts')
@@ -20,7 +21,7 @@ export class CartEntity extends BaseEntity {
   @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.carts)
+  @OneToOne(() => UserEntity, (user) => user.carts)
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
