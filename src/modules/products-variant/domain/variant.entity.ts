@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  ManyToMany,
 } from 'typeorm';
 import { ProducstEntity } from '@modules/products/domain/products.entity';
 import { StoreEntity } from '@modules/store/domain/store.entity';
@@ -15,6 +16,8 @@ import { ColorEntity } from '@modules/color-variant/domain/color.entity';
 import { SizeEntity } from '@modules/size-variant/domain/size.entity';
 import { ImageEntity } from './image.entity';
 import { OrderItemEntity } from '@modules/order-items/domain/orderItem.entity';
+import { PromotionEntity } from '@modules/promotion/domain/promotion.entity';
+
 @Entity('variants')
 export class ProductVariantEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -44,8 +47,20 @@ export class ProductVariantEntity extends BaseEntity {
   @Column({ name: 'color_id', type: 'uuid' })
   colorId: string;
 
-  @Column({ name: 'size_id', type: 'uuid' }) // Corrected name from 'store_id' to 'size_id'
+  @Column({ name: 'size_id', type: 'uuid' })
   sizeId: string;
+
+  @Column({ name: 'is_deleted', type: 'boolean', default: false })
+  isDeleted: boolean;
+
+  @Column({ type: 'enum', enum: ['fixed', 'percent'], default: 'fixed' })
+  promotionType: 'fixed' | 'percent'; // Loại khuyến mãi
+
+  @Column({ type: 'numeric', default: 0 })
+  promotionValue: number; // Giá trị khuyến mãi
+
+  @Column({ type: 'numeric', default: 0 })
+  discountPrice: number; // Giá sau khuyến mãi
 
   @ManyToOne(() => ProducstEntity, (product) => product.productVariants)
   @JoinColumn({ name: 'product_id' })
@@ -67,6 +82,11 @@ export class ProductVariantEntity extends BaseEntity {
     cascade: true,
   })
   images: ImageEntity[];
+
+  @ManyToMany(() => PromotionEntity, (promotion) => promotion.productVariant, {
+    cascade: true,
+  })
+  promotions: PromotionEntity[];
 
   @OneToMany(() => OrderItemEntity, (orderItems) => orderItems.product)
   orderItems: OrderItemEntity[];

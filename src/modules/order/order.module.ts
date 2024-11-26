@@ -13,6 +13,6 @@ import { AuthLibModule } from '@libs/auth-lib/auth.lib.module';
   ],
   controllers: [OrderController],
   providers: [OrderService],
-  exports: [],
+  exports: [OrderService],
 })
 export class OrderModule {}

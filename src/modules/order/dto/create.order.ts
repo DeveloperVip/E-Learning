@@ -3,11 +3,11 @@ import {
   IsNumber,
   IsUUID,
   IsOptional,
-  IsArray,
-  ValidateNested,
+  // IsArray,
+  // ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateOrderItemDto } from '@modules/order-items/dto/create.dto';
+// import { CreateOrderItemDto } from '@modules/order-items/dto/create.dto';
 import { OrderStatus, PaymentMethod } from '../domain/order.entity';
 
 export class CreateOrderDto {
@@ -16,7 +16,7 @@ export class CreateOrderDto {
     example: '123 Main St, Springfield, IL',
   })
   @IsString()
-  address: string;
+  address?: string;
 
   @ApiProperty({
     description:
@@ -32,7 +32,14 @@ export class CreateOrderDto {
     example: 1234567890,
   })
   @IsNumber()
-  phone: number;
+  phone?: number;
+
+  @ApiProperty({
+    description: 'total shipping fee',
+    example: 20000,
+  })
+  @IsNumber()
+  shippingFee?: number;
 
   @ApiProperty({
     description: 'The total price of the order before applying promotion.',
@@ -65,13 +72,21 @@ export class CreateOrderDto {
   @IsOptional()
   promotion?: number;
 
-  @ApiProperty({
-    description: 'An array of items included in the order.',
-    type: [CreateOrderItemDto],
-  })
-  @IsArray()
-  @ValidateNested({ each: true })
-  orderItems: CreateOrderItemDto[];
+  // @ApiProperty({
+  //   description: 'An array of items included in the order.',
+  //   type: [CreateOrderItemDto],
+  // })
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // orderItems?: CreateOrderItemDto[];
 
   orderCode?: string;
+
+  @ApiProperty({
+    description: 'Have VAT',
+    type: Boolean,
+    required: false,
+  })
+  @IsOptional()
+  isVAT?: boolean;
 }

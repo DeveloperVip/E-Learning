@@ -8,90 +8,138 @@ import { UpdateStoreDto } from './dto/update.dto';
 @Injectable()
 export class StoreService {
   private logger = new Logger(StoreService.name);
+
   constructor(
     @InjectRepository(StoreEntity)
-    private readonly StorageRespository: Repository<StoreEntity>,
+    private readonly StorageRepository: Repository<StoreEntity>,
   ) {}
 
-  //find store by id
+  // Find store by ID
   public async findById(id: string) {
-    const store = await this.StorageRespository.createQueryBuilder('store')
-      .leftJoinAndSelect('store.user', 'user')
-      .select(['store', 'user.id', 'user.email', 'user.userName'])
-      .where('store.id = :id', { id })
-      .getMany();
-    if (!store) {
-      throw new HttpException(`Store not found`, HttpStatus.NOT_FOUND);
+    try {
+      const store = await this.StorageRepository.createQueryBuilder('store')
+        .leftJoinAndSelect('store.user', 'user')
+        .select(['store', 'user.id', 'user.email', 'user.userName'])
+        .where('store.id = :id', { id })
+        .getOne();
+
+      if (!store) {
+        throw new HttpException(
+          `Store with ID ${id} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return store;
+    } catch (error) {
+      this.logger.error(`Failed to find store by ID ${id}`, error.stack);
+      throw new HttpException(
+        `Failed to retrieve store with ID ${id}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return store;
   }
 
-  //find all store
+  // Find all stores
   public async findAll() {
-    const store = await this.StorageRespository.createQueryBuilder('store')
-      .leftJoinAndSelect('store.user', 'user')
-      .select(['store', 'user.id', 'user.email', 'user.userName'])
-      .getMany();
-    this.logger.log(store);
-    if (store.length === 0)
-      throw new HttpException('Not have store', HttpStatus.NOT_FOUND);
-    return store;
+    try {
+      const stores = await this.StorageRepository.createQueryBuilder('store')
+        .leftJoinAndSelect('store.user', 'user')
+        .select(['store', 'user.id', 'user.email', 'user.userName'])
+        .getMany();
+
+      if (stores.length === 0) {
+        throw new HttpException('No stores found', HttpStatus.NOT_FOUND);
+      }
+
+      this.logger.log(`Retrieved ${stores.length} stores`);
+      return stores;
+    } catch {
+      throw new HttpException(
+        'Failed to retrieve stores',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  //create store
-  public async CreateStore(data: StoreCreateDTO) {
-    const existStore = await this.StorageRespository.find({
-      where: { name: data.name },
-    });
-    this.logger.log(existStore);
-    if (existStore.length !== 0) {
-      return new HttpException('Store was existed', HttpStatus.CONFLICT);
+  // Create a new store
+  public async createStore(data: StoreCreateDTO) {
+    try {
+      const existingStore = await this.StorageRepository.findOne({
+        where: { name: data.name },
+      });
+
+      if (existingStore) {
+        throw new HttpException('Store already exists', HttpStatus.CONFLICT);
+      }
+
+      const newStore = this.StorageRepository.create({
+        name: data.name,
+        userId: data.userId,
+        createAt: new Date(),
+      });
+
+      const savedStore = await this.StorageRepository.save(newStore);
+      this.logger.log(`Created new store with ID ${savedStore.id}`);
+      return savedStore;
+    } catch (error) {
+      this.logger.error('Failed to create store', error.stack);
+      throw new HttpException(
+        'Failed to create store',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-    return await this.StorageRespository.save({
-      name: data.name,
-      userId: data.userId,
-      createAt: new Date(),
-    });
   }
 
-  //update store
-  public async UpdateStore(data: UpdateStoreDto) {
-    // Tìm store theo id
-    const store = await this.StorageRespository.findOne({
-      where: { id: data.id },
-    });
-    if (!store) {
-      throw new HttpException(`Store not found`, HttpStatus.NOT_FOUND);
-    }
+  // Update a store
+  public async updateStore(data: UpdateStoreDto) {
+    try {
+      const store = await this.StorageRepository.findOne({
+        where: { id: data.id },
+      });
 
-    // Cập nhật thông tin store
-    store.updateAt = new Date();
-    Object.assign(store, data);
-    // Lưu bản ghi đã được cập nhật
-    return await this.StorageRespository.save(store);
+      if (!store) {
+        throw new HttpException('Store not found', HttpStatus.NOT_FOUND);
+      }
+
+      Object.assign(store, data);
+      store.updateAt = new Date();
+
+      const updatedStore = await this.StorageRepository.save(store);
+      this.logger.log(`Updated store with ID ${updatedStore.id}`);
+      return updatedStore;
+    } catch {
+      throw new HttpException(
+        'Failed to update store',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  //delete store
-  public async DeleteStore(storeData) {
-    if (storeData.userId) {
-      throw new HttpException('Unauthenticated', HttpStatus.UNAUTHORIZED);
+  // Delete a store
+  public async deleteStore(storeData) {
+    try {
+      if (!storeData.userId) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
+
+      const store = await this.StorageRepository.findOne({
+        where: { id: storeData.id },
+        relations: ['products'],
+      });
+
+      if (!store) {
+        throw new HttpException('Store not found', HttpStatus.NOT_FOUND);
+      }
+
+      await this.StorageRepository.remove(store);
+      this.logger.log(`Deleted store with ID ${store.id}`);
+      return { message: 'Store and related products deleted successfully' };
+    } catch {
+      throw new HttpException(
+        'Failed to delete store',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    // Tìm store theo id
-    const store = await this.StorageRespository.findOne({
-      where: { id: storeData.id },
-      relations: ['products'],
-    });
-
-    if (!store) {
-      throw new HttpException('Store not found', HttpStatus.NOT_FOUND);
-    }
-
-    await this.StorageRespository.remove(store);
-
-    throw new HttpException(
-      'Store and related products deleted successfully',
-      HttpStatus.ACCEPTED,
-    );
   }
 }

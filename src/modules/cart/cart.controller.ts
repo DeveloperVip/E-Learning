@@ -41,7 +41,7 @@ export class CartController {
   @UseGuards(JwtAuthGuard)
   @Post('create/add-item')
   async addItemToCart(
-    @Body() addItemToCartDto: AddItemToCartDto,
+    @Body() addItemToCartDto: Partial<AddItemToCartDto>,
     @Request() req,
   ) {
     const userId = req.user.userId;
@@ -63,6 +63,8 @@ export class CartController {
     @Param('cartId') cartId: string,
     @Body() updateItemQuantityDto: UpdateItemQuantityDto,
   ) {
+    console.log(cartId, updateItemQuantityDto);
+
     const { productId, amount } = updateItemQuantityDto;
     return await this.cartService.increaseItemQuantity(
       cartId,
@@ -110,6 +112,13 @@ export class CartController {
   ) {
     const { status } = data;
     return await this.cartService.convertToOrder(status, orderItemId, orderId);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('update-cart/:cartId')
+  async updateCart(@Param() param) {
+    return await this.cartService.updateCartTotal(param.cartId);
   }
 
   // Clear all items in the cart

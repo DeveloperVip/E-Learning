@@ -5,7 +5,6 @@ import { ApiProperty } from '@nestjs/swagger';
 export type ICreateColorDTO = Omit<IColor, 'id' | 'updateAt' | 'createAt'>;
 
 export class CreateColorDTO implements ICreateColorDTO {
-  @IsNotEmpty()
   storeId?: string;
 
   @ApiProperty({ example: 'name color' })

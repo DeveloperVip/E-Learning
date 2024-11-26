@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsArray,
   IsString,
+  IsEnum,
 } from 'class-validator';
 
 export class UpdateProductVariantDto {
@@ -51,6 +52,16 @@ export class UpdateProductVariantDto {
   @IsBoolean()
   isFeatured?: boolean;
 
+  // @ApiProperty({
+  //   description: 'Deleted product ',
+  //   type: Boolean,
+  //   required: false,
+  //   default: false,
+  // })
+  // @IsOptional()
+  // @IsBoolean()
+  // isDeleted?: boolean;
+
   @IsUUID()
   @IsNotEmpty()
   storeId: string;
@@ -83,13 +94,22 @@ export class UpdateProductVariantDto {
   @IsOptional()
   imageUrls?: string[];
 
-  // @ApiProperty({
-  //   description: 'Delete image URLs',
-  //   type: [String],
-  //   required: false,
-  // })
-  // @IsArray()
-  // @IsString({ each: true })
-  // @IsOptional()
-  // imageUrlsDelete?: string[];
+  @ApiProperty({
+    description:
+      'The type of promotion for the product variant (fixed or percent)',
+    enum: ['fixed', 'percent'],
+    default: 'fixed',
+  })
+  @IsEnum(['fixed', 'percent'])
+  @IsOptional()
+  promotionType: 'fixed' | 'percent';
+
+  @ApiProperty({
+    description: 'The value of the promotion (amount or percentage)',
+    type: Number,
+    default: 0,
+  })
+  @IsNumber()
+  @IsOptional()
+  promotionValue: number;
 }

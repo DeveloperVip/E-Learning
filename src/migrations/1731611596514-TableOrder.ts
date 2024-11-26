@@ -12,6 +12,7 @@ export class TableOrder1731611596514 implements MigrationInterface {
     referencedTableName: 'users',
     onDelete: 'CASCADE',
   });
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create 'orders' table
     await queryRunner.createTable(
@@ -28,18 +29,25 @@ export class TableOrder1731611596514 implements MigrationInterface {
           {
             name: 'address',
             type: 'varchar',
-            isNullable: false,
+            isNullable: true,
+          },
+          {
+            name: 'vat',
+            type: 'numeric',
+            isNullable: true,
+            default: 0,
           },
           {
             name: 'status',
             type: 'enum',
-            enum: ['in_progress', 'delivered', 'not_paid'],
+            enum: ['in_progress', 'delivered', 'not_paid', 'cancel'],
             default: "'not_paid'",
           },
           {
             name: 'phone',
             type: 'numeric',
             default: '0',
+            isNullable: true,
           },
           {
             name: 'total',
@@ -54,19 +62,27 @@ export class TableOrder1731611596514 implements MigrationInterface {
           {
             name: 'order_code',
             type: 'varchar',
-            default: null,
+            isNullable: true,
+          },
+          {
+            name: 'shipping_fee',
+            type: 'decimal',
+            precision: 20,
+            scale: 2,
+            default: 0,
           },
           {
             name: 'payment_method',
             type: 'enum',
             enum: ['cash', 'bank_transfer', 'linked_wallet'],
-            default: `'cash'`,
+            default: "'cash'",
           },
           {
             name: 'promotion',
             type: 'decimal',
             precision: 20,
             scale: 2,
+            default: 0,
           },
           {
             name: 'created_at',

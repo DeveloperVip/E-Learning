@@ -11,7 +11,7 @@ import {
   // Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiTags, OmitType } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateColorDTO } from './dto/color.dto';
 
 @Controller('color')
@@ -23,7 +23,7 @@ export class ColorController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('create/:storeId')
-  @ApiBody({ type: OmitType(CreateColorDTO, ['storeId'] as const) })
+  @ApiBody({ type: CreateColorDTO })
   async createColorController(
     @Param('storeId') storeId: string,
     @Body() req: CreateColorDTO,

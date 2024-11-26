@@ -17,7 +17,7 @@ export class TableOrderItem1731611602932 implements MigrationInterface {
     columnNames: ['product_id'],
     referencedColumnNames: ['id'],
     referencedTableName: 'productVariants',
-    onDelete: 'SET NULL',
+    onDelete: 'SET NULL', // If the product is deleted, set the product_id to null
   });
 
   private foreignKeyCart = new TableForeignKey({
@@ -67,6 +67,26 @@ export class TableOrderItem1731611602932 implements MigrationInterface {
             type: 'enum',
             enum: ['in cart', 'ordering', 'paid'],
             default: "'in cart'",
+          },
+          {
+            name: 'promotion',
+            type: 'int',
+            isNullable: true,
+          },
+          {
+            name: 'expired',
+            type: 'boolean',
+            default: false,
+          },
+          {
+            name: 'choosen',
+            type: 'boolean',
+            default: false,
+          },
+          {
+            name: 'shipping_fee',
+            type: 'numeric',
+            default: '0', // Default to 0 as per entity definition
           },
           {
             name: 'create_at',

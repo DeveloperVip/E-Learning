@@ -26,6 +26,9 @@ export class CartService {
     return await this.cartRepository
       .createQueryBuilder('cart')
       .leftJoinAndSelect('cart.orderItems', 'orderItem')
+      .leftJoinAndSelect('orderItem.product', 'productvariant')
+      .leftJoinAndSelect('productvariant.images', 'images')
+      .leftJoinAndSelect('productvariant.product', 'product')
       .where('cart.userId = :userId', { userId })
       .getOne();
   }
@@ -40,7 +43,11 @@ export class CartService {
     let cart = await this.getCartByUserId(userId);
 
     if (!cart) {
-      cart = this.cartRepository.create({ userId, total: 0, orderItems: [] });
+      cart = this.cartRepository.create({
+        userId,
+        total: 0,
+        orderItems: [],
+      });
       await this.cartRepository.save(cart);
     }
 
@@ -80,6 +87,10 @@ export class CartService {
       .createQueryBuilder('orderItem')
       .select('SUM(orderItem.price * orderItem.amount)', 'total')
       .where('orderItem.cartId = :cartId', { cartId })
+      .andWhere(
+        'orderItem.expired = :expired AND orderItem.choosen = :choosen',
+        { expired: false, choosen: true },
+      )
       .getRawOne();
 
     return total || 0;
@@ -94,8 +105,8 @@ export class CartService {
     const item = await this.orderItemRepository
       .createQueryBuilder('orderItem')
       .where(
-        'orderItem.cartId = :cartId AND orderItem.productId = :productId',
-        { cartId, productId },
+        'orderItem.cartId = :cartId AND orderItem.id = :productId AND orderItem.expired = :expired',
+        { cartId, productId, expired: false },
       )
       .getOne();
 
@@ -120,8 +131,8 @@ export class CartService {
     const item = await this.orderItemRepository
       .createQueryBuilder('orderItem')
       .where(
-        'orderItem.cartId = :cartId AND orderItem.productId = :productId',
-        { cartId, productId },
+        'orderItem.cartId = :cartId AND orderItem.id = :productId AND orderItem.expired = :expired',
+        { cartId, productId, expired: false },
       )
       .getOne();
 
@@ -166,7 +177,7 @@ export class CartService {
   }
 
   // Update the total cost of the cart after modification using createQueryBuilder
-  private async updateCartTotal(cartId: string): Promise<CartEntity> {
+  public async updateCartTotal(cartId: string): Promise<CartEntity> {
     const total = await this.calculateCartTotal(cartId);
 
     await this.cartRepository
@@ -181,6 +192,47 @@ export class CartService {
       relations: ['orderItems'],
     });
   }
+
+  // public async updateCart(
+  //   userId: string,
+  //   productId: string,
+  //   amount: number,
+  //   price: number,
+  // ): Promise<CartEntity> {
+  //   const cart = await this.getCartByUserId(userId);
+  //   const existingItem = cart.orderItems.find(
+  //     (item) => item.productId === productId,
+  //   );
+
+  //   if (existingItem) {
+  //     existingItem.amount += amount;
+  //     await this.orderItemRepository.save(existingItem);
+  //   } else {
+  //     // Create a new order item for the cart
+  //     const cartItem = this.orderItemRepository.create({
+  //       cartId: cart.id,
+  //       productId,
+  //       amount,
+  //       price,
+  //       status:
+  //         'in cart' === OrderItemStatus.IN_CART
+  //           ? OrderItemStatus.IN_CART
+  //           : OrderItemStatus.ORDERING,
+  //     });
+  //     await this.orderItemRepository.save(cartItem);
+  //     cart.orderItems.push(cartItem);
+  //   }
+
+  //   // Recalculate the total price of the cart
+  //   cart.total = await this.calculateCartTotal(cart.id);
+
+  //   await this.cartRepository.save(cart);
+
+  //   return await this.cartRepository.findOne({
+  //     where: { id: cartId },
+  //     relations: ['orderItems'],
+  //   });
+  // }
 
   // Clear all items in the cart
   async clearCart(cartId: string): Promise<void> {

@@ -23,6 +23,7 @@ import { ProductVariantModule } from '@modules/products-variant/variant.module';
 import { OrderModule } from '@modules/order/order.module';
 import { OrderItemModule } from '@modules/order-items/orderItem.module';
 import { CartModule } from '@modules/cart/cart.module';
+import { PromotionModule } from '@modules/promotion/promotion.module';
 
 // import { JwtModule } from '@nestjs/jwt';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -36,18 +37,19 @@ import { CartModule } from '@modules/cart/cart.module';
     UsersModule,
     FileUploadModule,
     AuthModule,
-    ProductsModule,
-    ColorModule,
-    SizeModule,
-    StorageModule,
     StoreModule,
     BrandModule,
-    CategoriesModule,
     BillboardModule,
+    CategoriesModule,
+    ProductsModule,
     ProductVariantModule,
-    OrderModule,
+    ColorModule,
+    SizeModule,
     OrderItemModule,
+    OrderModule,
     CartModule,
+    PromotionModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CloudinaryService],

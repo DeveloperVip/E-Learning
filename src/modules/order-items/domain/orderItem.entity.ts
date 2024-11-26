@@ -12,7 +12,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 
-// Định nghĩa các trạng thái của OrderItem
+// Define the possible states of the OrderItem
 export enum OrderItemStatus {
   IN_CART = 'in cart',
   ORDERING = 'ordering',
@@ -27,7 +27,6 @@ export class OrderItemEntity extends BaseEntity {
   @Column({ name: 'product_id', type: 'uuid' })
   productId: string;
 
-  // Cập nhật cột status để sử dụng enum
   @Column({
     type: 'enum',
     enum: OrderItemStatus,
@@ -38,7 +37,7 @@ export class OrderItemEntity extends BaseEntity {
   @Column({ name: 'order_id', type: 'uuid', nullable: true })
   orderId: string | null;
 
-  @Column({ name: 'card_id', type: 'uuid', nullable: true })
+  @Column({ name: 'cart_id', type: 'uuid', nullable: true })
   cartId: string | null;
 
   @Column({ type: 'numeric', default: 0 })
@@ -46,6 +45,19 @@ export class OrderItemEntity extends BaseEntity {
 
   @Column({ type: 'int' })
   amount: number;
+
+  @Column({ name: 'promotion', type: 'int', nullable: true })
+  promotion: number;
+
+  @Column({ name: 'expired', type: 'boolean', default: false })
+  expired: boolean;
+
+  @Column({ name: 'choosen', type: 'boolean', default: false })
+  choosen: boolean;
+
+  // Add a new column for shipping fee
+  @Column({ name: 'shipping_fee', type: 'numeric', default: 0 })
+  shippingFee: number; // Shipping fee for this item
 
   @ManyToOne(() => ProductVariantEntity, (variant) => variant.orderItems)
   @JoinColumn({ name: 'product_id' })

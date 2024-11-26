@@ -22,6 +22,7 @@ export enum OrderStatus {
   IN_PROGRESS = 'in_progress', // Đang giao hàng
   DELIVERED = 'delivered', // Giao hàng thành công
   NOT_PAID = 'not_paid', // Chưa thanh toán
+  CANCEL = 'cancel', // Đơn hàng bị hủy
 }
 
 @Entity('orders')
@@ -29,8 +30,11 @@ export class OrderEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   address: string;
+
+  @Column({ type: 'numeric', nullable: true, default: 0 })
+  vat?: number;
 
   @Column({
     type: 'enum',
@@ -39,7 +43,7 @@ export class OrderEntity extends BaseEntity {
   })
   status: OrderStatus;
 
-  @Column({ type: 'numeric', default: 0 })
+  @Column({ type: 'numeric', default: 0, nullable: true })
   phone: number;
 
   @Column({ type: 'decimal', precision: 20, scale: 2 })
@@ -50,6 +54,9 @@ export class OrderEntity extends BaseEntity {
 
   @Column({ name: 'order_code', type: 'varchar', default: null })
   orderCode: string;
+
+  @Column({ type: 'decimal', precision: 20, scale: 2, default: 0 })
+  shippingFee: number;
 
   @Column({
     type: 'enum',

@@ -1,13 +1,4 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsUUID,
-  Min,
-  IsPositive,
-  IsString,
-  Length,
-  IsEnum,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUUID, Min, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum ItemStatus {
@@ -18,10 +9,6 @@ export enum ItemStatus {
 }
 
 export class AddItemToCartDto {
-  @ApiProperty({
-    description: 'The ID of the user who owns the cart',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
   @IsUUID()
   @IsNotEmpty()
   userId: string;
@@ -51,23 +38,6 @@ export class AddItemToCartDto {
   @IsPositive()
   @Min(0)
   price: number;
-
-  @ApiProperty({
-    description: 'The status of the cart item',
-    example: 'pending',
-    enum: ItemStatus,
-  })
-  @IsEnum(ItemStatus)
-  @IsNotEmpty()
-  status: ItemStatus;
-
-  @ApiProperty({
-    description: 'A description of the product in the cart',
-    example: 'A high-quality product for daily use',
-  })
-  @IsString()
-  @Length(1, 255)
-  description: string;
 }
 
 export class UpdateItemQuantityDto {

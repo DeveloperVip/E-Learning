@@ -9,7 +9,7 @@ export class CreateProductVariantTable1630503939443
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Create the 'variant' table
+    // Create the 'variants' table
     await queryRunner.createTable(
       new Table({
         name: 'variants',
@@ -72,6 +72,27 @@ export class CreateProductVariantTable1630503939443
             type: 'uuid',
             isNullable: false,
           },
+          {
+            name: 'promotion_type',
+            type: 'enum',
+            enum: ['fixed', 'percent'],
+            default: `'fixed'`,
+          },
+          {
+            name: 'promotion_value',
+            type: 'numeric',
+            default: '0',
+          },
+          {
+            name: 'discount_price',
+            type: 'numeric',
+            default: '0',
+          },
+          {
+            name: 'is_deleted',
+            type: 'boolean',
+            default: false,
+          },
         ],
       }),
       true,
@@ -107,6 +128,7 @@ export class CreateProductVariantTable1630503939443
         onDelete: 'CASCADE',
       }),
     );
+
     await queryRunner.createForeignKey(
       'variants',
       new TableForeignKey({

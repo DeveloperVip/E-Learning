@@ -35,6 +35,15 @@ export class ProductsDto {
   isFeatured?: boolean;
 
   @ApiProperty({
+    description: 'Delete Product',
+    type: Boolean,
+    required: false,
+    default: false,
+  })
+  @IsOptional()
+  isDeleted?: boolean;
+
+  @ApiProperty({
     description: 'The ID of the brand associated with the product',
     type: String,
   })

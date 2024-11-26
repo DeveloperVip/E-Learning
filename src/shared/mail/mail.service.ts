@@ -82,4 +82,40 @@ export class EmailService {
       throw new Error('Error sending verification email');
     }
   }
+
+  async sendInvoiceEmail(to: string, filePath: string): Promise<void> {
+    const templatePath = path.join(
+      process.cwd(),
+      'dist',
+      'assets',
+      'libs',
+      'mail',
+      'src',
+      'template-email',
+      'invoice-template.hbs',
+    );
+
+    try {
+      // Send invoice email
+      await this.sendMail({
+        to: to,
+        subject: 'Hóa đơn VAT của bạn',
+        templatePath: templatePath,
+        context: {
+          title: 'Hóa đơn VAT của bạn',
+          message: 'Xin vui lòng xem hóa đơn đính kèm.',
+        },
+        attachments: [
+          {
+            filename: path.basename(filePath),
+            path: filePath,
+          },
+        ],
+      });
+      this.logger.log('Invoice email sent successfully');
+    } catch (error) {
+      this.logger.error('Failed to send invoice email:', error);
+      throw new Error('Error sending invoice email');
+    }
+  }
 }

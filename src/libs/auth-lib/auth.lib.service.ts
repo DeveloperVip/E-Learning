@@ -9,6 +9,7 @@ import { ResponseLoginDto } from 'src/modules/users/dto/response-login-dto';
 import { statusResponse } from 'src/modules/users/status.enum';
 // import { isDefined } from 'class-validator';
 import { EmailService } from '@shared';
+import { hash as hashBcrypt } from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
@@ -51,6 +52,45 @@ export class AuthService {
       message: 'success',
     };
     return response;
+  }
+
+  async updatePassword(
+    oldPassword: string,
+    email: string,
+    newPassword: string,
+  ): Promise<any> {
+    // Tìm user trong database bằng email
+    const user = await this.UsersService.findUser(email);
+    if (!user) {
+      return {
+        data: null,
+        status: statusResponse.ERROR,
+        message: 'User not found',
+      };
+    }
+
+    // Kiểm tra mật khẩu cũ
+    const isValidPassword = await compare(oldPassword, user.password);
+    if (!isValidPassword) {
+      return {
+        data: null,
+        status: statusResponse.ERROR,
+        message: 'Incorrect password',
+      };
+    }
+
+    // Hash mật khẩu mới và lưu vào database
+    const hashedPassword = await hashBcrypt(newPassword, 10);
+    user.password = hashedPassword;
+
+    // Lưu user vào database
+    await this.UsersService.saveUser(user);
+
+    return {
+      data: null,
+      status: statusResponse.SUCCESS,
+      message: 'Password updated successfully',
+    };
   }
 
   public async login(userInfo): Promise<ResponseLoginDto> {
@@ -105,7 +145,7 @@ export class AuthService {
       if (error)
         throw new HttpException(
           'Failed to create user or send verification email',
-          HttpStatus.INTERNAL_SERVER_ERROR,
+          HttpStatus.BAD_REQUEST,
         );
     }
   }

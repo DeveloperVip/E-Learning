@@ -10,9 +10,15 @@ import {
 } from '@nestjs/common';
 import { OrderItemService } from './orderItem.service';
 import { OrderItemEntity } from './domain/orderItem.entity';
-import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiProperty,
+  ApiTags,
+  PartialType,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '@libs/auth-lib/jwt-auth.guard';
-import { CreateOrderItemDto } from './dto/create.dto';
+// import { CreateOrderItemDto } from './dto/create.dto';
+import { UpdateOrderItemDto } from './dto/update.dto';
 
 @Controller('order-items')
 @ApiTags('order-items')
@@ -45,11 +51,13 @@ export class OrderItemController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
-  @ApiProperty({ type: CreateOrderItemDto })
+  @ApiProperty({ type: PartialType<UpdateOrderItemDto> })
   async update(
     @Param('id') id: string,
-    @Body() updateData: CreateOrderItemDto,
+    @Body() updateData: Partial<UpdateOrderItemDto>,
   ): Promise<OrderItemEntity> {
+    console.log(updateData);
+
     return await this.orderItemService.update(id, updateData);
   }
 
