@@ -7,6 +7,8 @@ import {
   Patch,
   Delete,
   UseGuards,
+  Post,
+  Response,
 } from '@nestjs/common';
 import { OrderItemService } from './orderItem.service';
 import { OrderItemEntity } from './domain/orderItem.entity';
@@ -19,20 +21,27 @@ import {
 import { JwtAuthGuard } from '@libs/auth-lib/jwt-auth.guard';
 // import { CreateOrderItemDto } from './dto/create.dto';
 import { UpdateOrderItemDto } from './dto/update.dto';
+import { CreateOrderItemDto } from './dto/create.dto';
 
 @Controller('order-items')
 @ApiTags('order-items')
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
 
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
-  // @Post('create')
-  // async create(
-  //   @Body() orderItemData: Partial<OrderItemEntity>,
-  // ): Promise<OrderItemEntity> {
-  //   return await this.orderItemService.create(orderItemData);
-  // }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('create')
+  async create(
+    @Body() orderItemData: Partial<CreateOrderItemDto>,
+    @Response() res,
+  ): Promise<any> {
+    const newItem = await this.orderItemService.create(orderItemData);
+    if (newItem) return res.status(201).json('Tạo order item thành công');
+    else
+      return res
+        .status(400)
+        .json('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
+  }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

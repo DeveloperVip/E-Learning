@@ -41,7 +41,7 @@ export class AuthController {
   @Post('/create-user')
   @ApiBody({ type: CreateUserDto })
   public async createUser(@Body() userInfo: CreateUserDto) {
-    // this.logger.log('user', userInfo);
+    this.logger.log('user', userInfo);
     return await this.AuthLibService.createUser(userInfo);
   }
 

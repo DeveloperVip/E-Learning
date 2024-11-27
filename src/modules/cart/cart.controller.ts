@@ -8,6 +8,7 @@ import {
   Patch,
   UseGuards,
   Request,
+  Response,
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { ApiBearerAuth, ApiProperty, ApiTags } from '@nestjs/swagger';
@@ -28,12 +29,13 @@ export class CartController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('get-cart')
-  async getCartByUserId(@Request() req) {
+  async getCartByUserId(@Request() req, @Response() res) {
     const cart = await this.cartService.getCartByUserId(req.user.userId);
     if (!cart) {
-      return { message: 'Cart not found' };
+      return res.status(404).json('Không tìm thấy giỏ hàng');
     }
-    return cart;
+    console.log(cart);
+    return res.status(200).json(cart);
   }
 
   // Add item to the cart

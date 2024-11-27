@@ -1,4 +1,4 @@
-import { IsUUID, IsNumber, IsEnum } from 'class-validator';
+import { IsUUID, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { OrderItemStatus } from '../domain/orderItem.entity';
 
@@ -15,11 +15,9 @@ export class CreateOrderItemDto {
     description: 'The ID of the order that this item is part of.',
     example: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
   })
-  @IsUUID()
-  orderId: string;
+  orderId: string | null;
 
-  @IsEnum(OrderItemStatus)
-  status: OrderItemStatus;
+  status?: OrderItemStatus;
 
   @ApiProperty({
     description: 'The price of a single unit of the product variant.',
