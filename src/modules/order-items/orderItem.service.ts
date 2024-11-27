@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrderItemEntity } from './domain/orderItem.entity';
+import { OrderItemEntity, OrderItemStatus } from './domain/orderItem.entity';
+import { CreateOrderItemDto } from './dto/create.dto';
 
 @Injectable()
 export class OrderItemService {
@@ -9,6 +10,17 @@ export class OrderItemService {
     @InjectRepository(OrderItemEntity)
     private readonly orderItemRepository: Repository<OrderItemEntity>,
   ) {}
+
+  async create(orderItemData: Partial<CreateOrderItemDto>) {
+    const cartItem = this.orderItemRepository.create({
+      ...orderItemData,
+      status:
+        'in cart' === OrderItemStatus.IN_CART
+          ? OrderItemStatus.IN_CART
+          : OrderItemStatus.ORDERING,
+    });
+    return await this.orderItemRepository.save(cartItem);
+  }
 
   calculateShippingFee(distance: number, productWeight: number): number {
     let shippingFee = 0;
